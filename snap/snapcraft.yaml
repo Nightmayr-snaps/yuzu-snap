@@ -39,10 +39,10 @@ parts:
       - sqlite3
       - libsqlite3-dev
       - libsdl2-dev 
-      - qtbase5-dev 
-      - libqt5opengl5-dev 
-      - qtwebengine5-dev 
-      - qtbase5-private-dev 
+      # - qtbase5-dev 
+      # - libqt5opengl5-dev 
+      # - qtwebengine5-dev 
+      # - qtbase5-private-dev 
       - python
       - libboost-dev
       - libboost-context-dev
@@ -61,4 +61,5 @@ parts:
 
 apps:
   yuzu:
-    command: yuzu
+    command: ../parts/yuzu/build/bin/yuzu
+    
