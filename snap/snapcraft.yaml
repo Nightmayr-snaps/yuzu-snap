@@ -10,15 +10,25 @@ grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: devmode # use 'strict' once you have the right plugs and slots
 
 parts:
+  qt: # this 'part' will probably not be needed once base core20 is available
+    source: https://code.qt.io/qt/qt5.git
+    source-branch: "5.12"
+    plugin: make
+    override-build: |
+      # ../src/init-repository
+      ./configure -opensource -nomake examples -nomake tests
+      make
+      make install
+    build-packages:
+      - libvulkan-dev
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
-    # See 'snapcraft plugins'
     plugin: cmake
     build-snaps:
       - cmake
     override-build: |
       pip3 install conan
-      cmake ../src \
+      cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-5.12.8/lib/cmake ../src \
         -GNinja
       ninja
     build-packages:
@@ -44,6 +54,8 @@ parts:
       - libopus-dev
       - zlib1g-dev
       - libzstd-dev
+    after:
+      - qt
 
     
 
