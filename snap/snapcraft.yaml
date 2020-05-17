@@ -17,7 +17,7 @@ parts:
     override-build: |
       # ../src/init-repository
       ./configure -opensource -nomake examples -nomake tests
-      make
+      make -j16
       make install
     build-packages:
       - libvulkan-dev
@@ -31,6 +31,7 @@ parts:
       cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-5.12.8/lib/cmake ../src \
         -GNinja
       ninja
+      ninja install
     build-packages:
       - cmake
       - ninja-build
@@ -61,5 +62,6 @@ parts:
 
 apps:
   yuzu:
-    command: ../parts/yuzu/build/bin/yuzu
+    # command: ../parts/yuzu/build/bin/yuzu
+    command: yuzu
     
