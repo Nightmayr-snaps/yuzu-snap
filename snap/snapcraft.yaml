@@ -10,28 +10,35 @@ grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: devmode # use 'strict' once you have the right plugs and slots
 
 parts:
-  qt: # this 'part' will probably not be needed once base core20 is available
-    source: https://code.qt.io/qt/qt5.git
-    source-branch: "5.12"
-    plugin: make
-    override-build: |
-      # ../src/init-repository
-      ./configure -opensource -nomake examples -nomake tests
-      make -j16
-      make install
-    build-packages:
-      - libvulkan-dev
+  # qt: # this 'part' will probably not be needed once base core20 is available
+  #   source: https://code.qt.io/qt/qt5.git
+  #   source-branch: "5.12"
+  #   plugin: make
+  #   override-build: |
+  #     ./configure -opensource -nomake examples -nomake tests
+  #     export DESTDIR="/root/parts/qt/install"
+  #     # make -j$(nproc)
+  #     make -j$(($(nproc)-2))
+  #     make install
+  #   build-packages:
+  #     - libvulkan-dev
+  #   # stage:
+  #   #   - -*
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
     plugin: cmake
     build-snaps:
       - cmake
+      - kde-frameworks-5-core18
+      - kde-frameworks-5-core18-sdk
     override-build: |
       pip3 install conan
-      cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-5.12.8/lib/cmake ../src \
-        -GNinja
-      ninja
-      ninja install
+      snapcraftctl build
+      # cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-5.12.8/lib/cmake ../src \
+      # cmake ../src \
+      #   -GNinja
+      # ninja
+      # DESTDIR=../install ninja install
     build-packages:
       - cmake
       - ninja-build
@@ -44,6 +51,7 @@ parts:
       # - libqt5opengl5-dev 
       # - qtwebengine5-dev 
       # - qtbase5-private-dev 
+      # - libvulkan-dev
       - python
       - libboost-dev
       - libboost-context-dev
@@ -55,13 +63,44 @@ parts:
       - libopus-dev
       - zlib1g-dev
       - libzstd-dev
-    after:
-      - qt
+    stage:
+      - share
+      - bin
+    stage-snaps:
+      - kde-frameworks-5-core18
+      - kde-frameworks-5-core18-sdk
+    # after:
+    #   - qt
+  # desktop-qt5:
+  #   build-packages:
+  #   - build-essential
+  #   - qtbase5-dev
+  #   - dpkg-dev
+  #   make-parameters:
+  #   - FLAVOR=qt5
+  #   plugin: make
+  #   source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+  #   source-subdir: qt
+  #   stage-packages:
+  #   - libxkbcommon0
+  #   - ttf-ubuntu-font-family
+  #   - dmz-cursor-theme
+  #   - light-themes
+  #   - adwaita-icon-theme
+  #   - gnome-themes-standard
+  #   - shared-mime-info
+  #   - libqt5gui5
+  #   - libgdk-pixbuf2.0-0
+  #   - libqt5svg5
+  #   - try:
+  #     - appmenu-qt5
+  #   - locales-all
+  #   - xdg-user-dirs
 
     
 
 apps:
   yuzu:
     # command: ../parts/yuzu/build/bin/yuzu
-    command: yuzu
+    command: bin/yuzu
     
