@@ -31,6 +31,8 @@ parts:
       - kde-frameworks-5-core18-sdk
     stage-packages:
       - libgpm2
+      - freeglut3
+      - libslang2
     filesets:
       library-shared:
       - '**/lib/**/*.so*'
@@ -86,11 +88,11 @@ parts:
       - libsdl2-2.0-0
       # - libsdl2-mixer-2.0-0
       # - libsdl2-image-2.0-0
-      - libxi-dev
+      # - libxi-dev
       - libxi6
       - libxinerama1
       - libxrandr2
-      - libsdl2-dev
+      # - libsdl2-dev
     # filesets:
     #   library-shared:
     #   - '**/lib/**/libSDL2-2.0.so.0'
@@ -98,7 +100,7 @@ parts:
     stage:
       - share
       - bin
-      - '**/lib/**/libSDL2-2.0.so.0'
+      # - '**/lib/**/libSDL2-2.0.so.0'
       # - $library-shared
     after:
       - qt5
