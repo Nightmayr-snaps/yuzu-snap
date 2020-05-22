@@ -24,6 +24,25 @@ parts:
   #     - libvulkan-dev
   #   # stage:
   #   #   - -*
+  qt5:
+    plugin: nil
+    stage-snaps:
+      - kde-frameworks-5-core18
+      - kde-frameworks-5-core18-sdk
+    stage-packages:
+      - libgpm2
+    filesets:
+      library-shared:
+      - '**/lib/**/*.so*'
+      # exclude-common:
+      # - -[bin/bunzip2, bin/bzcat, bin/binzip2, bin/bzip2recover]
+    stage:
+      - -bin/bunzip2
+      - -bin/bzcat
+      - -bin/bzip2
+      - -bin/bzip2recover
+    prime:
+      - $library-shared
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
     plugin: cmake
@@ -63,14 +82,26 @@ parts:
       - libopus-dev
       - zlib1g-dev
       - libzstd-dev
+    stage-packages:
+      - libsdl2-2.0-0
+      # - libsdl2-mixer-2.0-0
+      # - libsdl2-image-2.0-0
+      - libxi-dev
+      - libxi6
+      - libxinerama1
+      - libxrandr2
+      - libsdl2-dev
+    # filesets:
+    #   library-shared:
+    #   - '**/lib/**/libSDL2-2.0.so.0'
+    #   # - '**/lib/**/'
     stage:
       - share
       - bin
-    stage-snaps:
-      - kde-frameworks-5-core18
-      - kde-frameworks-5-core18-sdk
-    # after:
-    #   - qt
+      - '**/lib/**/libSDL2-2.0.so.0'
+      # - $library-shared
+    after:
+      - qt5
   # desktop-qt5:
   #   build-packages:
   #   - build-essential
@@ -103,4 +134,6 @@ apps:
   yuzu:
     # command: ../parts/yuzu/build/bin/yuzu
     command: bin/yuzu
+    environment:
+      "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
     
