@@ -33,6 +33,7 @@ parts:
       - libgpm2
       - freeglut3
       - libslang2
+      - libsdl2-2.0-0
     filesets:
       library-shared:
       - '**/lib/**/*.so*'
@@ -137,5 +138,6 @@ apps:
     # command: ../parts/yuzu/build/bin/yuzu
     command: bin/yuzu
     environment:
+      "QT_QPA_PLATFORM_PLUGIN_PATH": "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/plugins"
       "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
     
