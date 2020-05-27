@@ -5,9 +5,10 @@ summary: yuzu is an experimental open-source emulator for the Nintendo Switch # 
 description: |
   Nintendo Switch Emulator. yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
   It is written in C++ with portability in mind, with builds actively maintained for Windows and Linux.
-
+license: GPL-2.0
+icon: snap/gui/yuzu.svg
 grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: strict # use 'strict' once you have the right plugs and slots
 
 parts:
   # qt: # this 'part' will probably not be needed once base core20 is available
@@ -34,18 +35,21 @@ parts:
       - freeglut3
       - libslang2
       - libsdl2-2.0-0
+      - mesa-utils
+      - libgl1-mesa-glx
     filesets:
       library-shared:
       - '**/lib/**/*.so*'
-      # exclude-common:
-      # - -[bin/bunzip2, bin/bzcat, bin/binzip2, bin/bzip2recover]
     stage:
       - -bin/bunzip2
       - -bin/bzcat
       - -bin/bzip2
       - -bin/bzip2recover
+      - etc
+      - $library-shared
     prime:
       - $library-shared
+      - etc
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
     plugin: cmake
@@ -56,6 +60,7 @@ parts:
     override-build: |
       pip3 install conan
       snapcraftctl build
+      cp -R ../src/dist ../install
       # cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-5.12.8/lib/cmake ../src \
       # cmake ../src \
       #   -GNinja
@@ -87,12 +92,10 @@ parts:
       - libzstd-dev
     stage-packages:
       - libsdl2-2.0-0
-      # - libsdl2-mixer-2.0-0
-      # - libsdl2-image-2.0-0
-      # - libxi-dev
       - libxi6
       - libxinerama1
       - libxrandr2
+      - git
       # - libsdl2-dev
     # filesets:
     #   library-shared:
@@ -101,6 +104,10 @@ parts:
     stage:
       - share
       - bin
+      - dist
+      - lib
+      - -lib/x86_64-linux-gnu/libcom_err.so.2.1
+      # - etc
       # - '**/lib/**/libSDL2-2.0.so.0'
       # - $library-shared
     after:
@@ -139,5 +146,21 @@ apps:
     command: bin/yuzu
     environment:
       "QT_QPA_PLATFORM_PLUGIN_PATH": "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/plugins"
+      "XDG_RUNTIME_DIR": "/run/user/1000"
+      "FONTCONFIG_SYSROOT": $SNAP
+      "FONTCONFIG_PATH": $SNAP/etc/fonts/config.d
+      "FONTCONFIG_FILE": $SNAP/etc/fonts/fonts.conf
       "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
-    
+    plugs:
+      - desktop
+      - x11
+      - wayland
+      - pulseaudio
+      - opengl
+      - joystick
+      - unity7
+      - unity8
+      - mir
+      - network
+      - home
+  
