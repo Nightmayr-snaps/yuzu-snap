@@ -57,10 +57,28 @@ parts:
       - cmake
       - kde-frameworks-5-core18
       - kde-frameworks-5-core18-sdk
+    # organize: 
+    #   '$SNAPCRAFT_PART_INSTALL/bin': '$SNAPCRAFT_PART_INSTALL/bin/yuzu'
+      # '$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5': '$SNAPCRAFT_STAGE/usr/lib/qt'
+    # override-stage: |
+    #   # mkdir -p $SNAPCRAFT_PRIME/bin/yuzu
+    #   # mv $SNAPCRAFT_STAGE/bin/yuzu $SNAPCRAFT_PRIME/bin/yuzu
+    #   # mkdir -p $SNAPCRAFT_STAGE/usr/lib/qt
+    #   # cp -R --symbolic-link "usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5" "$usr/lib/qt"
+    #   for f in $(ls -d $SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5); do ln -sf $f $SNAPCRAFT_STAGE/usr/lib/qt; done
+    #   snapcraftctl stage
+    # override-prime: |
+    #   for f in $(ls -d $SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5); do ln -sf $f $SNAPCRAFT_PRIME/usr/lib/qt; done
+    #   mkdir -p $SNAPCRAFT_PRIME/usr/lib64
+    #   for f in $(ls -d $SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5); do ln -sf $f $SNAPCRAFT_PRIME/usr/lib64/qt; done
+    #   snapcraftctl prime
     override-build: |
       pip3 install conan
       snapcraftctl build
       cp -R ../src/dist ../install
+      # tried nesting yuzu binary 1 level deeper to see if icons found (below)
+      # mkdir -p $SNAPCRAFT_PART_INSTALL/bin/yuzu-emu
+      # mv $SNAPCRAFT_PART_INSTALL/bin/yuzu $SNAPCRAFT_PART_INSTALL/bin/yuzu-emu
       # cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-5.12.8/lib/cmake ../src \
       # cmake ../src \
       #   -GNinja
@@ -74,6 +92,7 @@ parts:
       - sqlite3
       - libsqlite3-dev
       - libsdl2-dev 
+      - python3-setuptools
       # - qtbase5-dev 
       # - libqt5opengl5-dev 
       # - qtwebengine5-dev 
@@ -142,7 +161,6 @@ parts:
 
 apps:
   yuzu:
-    # command: ../parts/yuzu/build/bin/yuzu
     command: bin/yuzu
     environment:
       "QT_QPA_PLATFORM_PLUGIN_PATH": "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/plugins"
@@ -151,6 +169,8 @@ apps:
       "FONTCONFIG_PATH": $SNAP/etc/fonts/config.d
       "FONTCONFIG_FILE": $SNAP/etc/fonts/fonts.conf
       "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
+      # "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/qt"
+      # "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/qt:$SNAP/usr/lib64/qt"
     plugs:
       - desktop
       - x11
