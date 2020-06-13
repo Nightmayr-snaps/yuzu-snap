@@ -25,31 +25,32 @@ parts:
   #     - libvulkan-dev
   #   # stage:
   #   #   - -*
-  qt5:
-    plugin: nil
-    stage-snaps:
-      - kde-frameworks-5-core18
-      - kde-frameworks-5-core18-sdk
-    stage-packages:
-      - libgpm2
-      - freeglut3
-      - libslang2
-      - libsdl2-2.0-0
-      - mesa-utils
-      - libgl1-mesa-glx
-    filesets:
-      library-shared:
-      - '**/lib/**/*.so*'
-    stage:
-      - -bin/bunzip2
-      - -bin/bzcat
-      - -bin/bzip2
-      - -bin/bzip2recover
-      - etc
-      - $library-shared
-    prime:
-      - $library-shared
-      - etc
+
+  # qt5:
+  #   plugin: nil
+  #   stage-snaps:
+  #     - kde-frameworks-5-core18
+  #     - kde-frameworks-5-core18-sdk
+  #   stage-packages:
+  #     - libgpm2
+  #     - freeglut3
+  #     - libslang2
+  #     - libsdl2-2.0-0
+  #     - mesa-utils
+  #     - libgl1-mesa-glx
+  #   filesets:
+  #     library-shared:
+  #     - '**/lib/**/*.so*'
+  #   stage:
+  #     - -bin/bunzip2
+  #     - -bin/bzcat
+  #     - -bin/bzip2
+  #     - -bin/bzip2recover
+  #     - etc
+  #     - $library-shared
+  #   prime:
+  #     - $library-shared
+  #     - etc
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
     plugin: cmake
@@ -75,7 +76,7 @@ parts:
     override-build: |
       pip3 install conan
       snapcraftctl build
-      cp -R ../src/dist ../install
+      # cp -R ../src/dist ../install
       # tried nesting yuzu binary 1 level deeper to see if icons found (below)
       # mkdir -p $SNAPCRAFT_PART_INSTALL/bin/yuzu-emu
       # mv $SNAPCRAFT_PART_INSTALL/bin/yuzu $SNAPCRAFT_PART_INSTALL/bin/yuzu-emu
@@ -114,7 +115,6 @@ parts:
       - libxi6
       - libxinerama1
       - libxrandr2
-      - git
       # - libsdl2-dev
     # filesets:
     #   library-shared:
@@ -123,41 +123,50 @@ parts:
     stage:
       - share
       - bin
-      - dist
+      # - dist
       - lib
       - -lib/x86_64-linux-gnu/libcom_err.so.2.1
       # - etc
       # - '**/lib/**/libSDL2-2.0.so.0'
       # - $library-shared
     after:
-      - qt5
-  # desktop-qt5:
-  #   build-packages:
-  #   - build-essential
-  #   - qtbase5-dev
-  #   - dpkg-dev
-  #   make-parameters:
-  #   - FLAVOR=qt5
-  #   plugin: make
-  #   source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-  #   source-subdir: qt
-  #   stage-packages:
-  #   - libxkbcommon0
-  #   - ttf-ubuntu-font-family
-  #   - dmz-cursor-theme
-  #   - light-themes
-  #   - adwaita-icon-theme
-  #   - gnome-themes-standard
-  #   - shared-mime-info
-  #   - libqt5gui5
-  #   - libgdk-pixbuf2.0-0
-  #   - libqt5svg5
-  #   - try:
-  #     - appmenu-qt5
-  #   - locales-all
-  #   - xdg-user-dirs
+      - desktop-qt5
+  desktop-qt5:
+    build-packages:
+    - build-essential
+    - qtbase5-dev
+    - dpkg-dev
+    make-parameters:
+    - FLAVOR=qt5
+    plugin: make
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: qt
+    stage-packages:
+    - libxkbcommon0
+    - ttf-ubuntu-font-family
+    - dmz-cursor-theme
+    - light-themes
+    - adwaita-icon-theme
+    - gnome-themes-standard
+    - shared-mime-info
+    - libqt5gui5
+    - libgtk2.0-0
+    - libgdk-pixbuf2.0-0
+    - libqt5svg5
+    - libgpm2
+    - freeglut3
+    - libslang2
+    - libsdl2-2.0-0
+    - mesa-utils
+    - libgl1-mesa-glx
+    - libopus0
+    - try:
+      - appmenu-qt5
+    - locales-all
+    - xdg-user-dirs
+    # after:
+    #   - qt5
 
-    
 
 apps:
   yuzu:
