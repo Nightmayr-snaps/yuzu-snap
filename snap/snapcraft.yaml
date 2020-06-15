@@ -14,8 +14,7 @@ parts:
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
     plugin: cmake
-    # cmake-parameters:
-    #   - DESTDIR=$SNAPCRAFT_PART_INSTALL
+    # cmake-parameters: ["-DCMAKE_INSTALL_PREFIX="]
     override-build: |
       pip3 install conan
       snapcraftctl build
@@ -49,11 +48,12 @@ parts:
       - libxi6
       - libxinerama1
       - libxrandr2
-    stage:
-      - share
-      - bin
-      - lib
-      - -lib/x86_64-linux-gnu/libcom_err.so.2.1
+    # stage:
+    #   # - share
+    #   # - bin
+
+    #   - lib
+    #   - -lib/x86_64-linux-gnu/libcom_err.so.2.1
     after:
       - desktop-qt5
   desktop-qt5:
@@ -89,17 +89,22 @@ parts:
       - appmenu-qt5
     - locales-all
     - xdg-user-dirs
+    - libzip5
+    - libpulse-dev
+    - pulseaudio
+    - libpulse0
 
+  
 apps:
   yuzu:
-    command: bin/yuzu
+    command: bin/desktop-launch $SNAP/usr/local/bin/yuzu
     environment:
       "QT_QPA_PLATFORM_PLUGIN_PATH": "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/plugins"
-      "XDG_RUNTIME_DIR": "/run/user/1000"
+      # "XDG_RUNTIME_DIR": "/run/user/1000"
       "FONTCONFIG_SYSROOT": $SNAP
       "FONTCONFIG_PATH": $SNAP/etc/fonts/config.d
       "FONTCONFIG_FILE": $SNAP/etc/fonts/fonts.conf
-      "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
+      "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
     plugs:
       - desktop
       - x11
@@ -112,4 +117,5 @@ apps:
       - mir
       - network
       - home
+      - removable-media
   
