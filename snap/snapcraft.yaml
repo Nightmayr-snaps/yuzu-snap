@@ -13,11 +13,15 @@ confinement: strict # use 'strict' once you have the right plugs and slots
 parts:
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
-    plugin: cmake
+    plugin: nil
     # cmake-parameters: ["-DCMAKE_INSTALL_PREFIX="]
     override-build: |
       pip3 install conan
-      snapcraftctl build
+      mkdir build && cd build
+      export DESTDIR=$SNAPCRAFT_PART_INSTALL
+      cmake .. -GNinja
+      ninja
+      ninja install
     build-packages:
       - cmake
       - ninja-build
@@ -29,6 +33,7 @@ parts:
       - python3-setuptools
       - qtbase5-dev 
       - libqt5opengl5-dev 
+      - libqt5svg5
       - qtwebengine5-dev 
       - qtbase5-private-dev 
       - libvulkan-dev
@@ -48,12 +53,10 @@ parts:
       - libxi6
       - libxinerama1
       - libxrandr2
-    # stage:
-    #   # - share
-    #   # - bin
-
-    #   - lib
-    #   - -lib/x86_64-linux-gnu/libcom_err.so.2.1
+      - qt5-gtk-platformtheme
+    stage:
+      - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
+      - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
     after:
       - desktop-qt5
   desktop-qt5:
@@ -94,13 +97,26 @@ parts:
     - pulseaudio
     - libpulse0
 
+plugs:
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+  sound-themes:
+    interface: content
+    target: $SNAP/data-dir/sounds
+    default-provider: gtk-common-themes
+
   
 apps:
   yuzu:
     command: bin/desktop-launch $SNAP/usr/local/bin/yuzu
     environment:
       "QT_QPA_PLATFORM_PLUGIN_PATH": "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/plugins"
-      # "XDG_RUNTIME_DIR": "/run/user/1000"
       "FONTCONFIG_SYSROOT": $SNAP
       "FONTCONFIG_PATH": $SNAP/etc/fonts/config.d
       "FONTCONFIG_FILE": $SNAP/etc/fonts/fonts.conf
