@@ -1,5 +1,5 @@
 name: yuzu # you probably want to 'snapcraft register <name>'
-base: core18 # the base snap is the execution environment for this snap
+base: core20 # the base snap is the execution environment for this snap
 version: '0.1' # just for humans, typically '1.2+git' or '1.3.2'
 summary: yuzu is an experimental open-source emulator for the Nintendo Switch # 79 char long summary
 description: |
@@ -11,79 +11,17 @@ grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: strict # use 'strict' once you have the right plugs and slots
 
 parts:
-  # qt: # this 'part' will probably not be needed once base core20 is available
-  #   source: https://code.qt.io/qt/qt5.git
-  #   source-branch: "5.12"
-  #   plugin: make
-  #   override-build: |
-  #     ./configure -opensource -nomake examples -nomake tests
-  #     export DESTDIR="/root/parts/qt/install"
-  #     # make -j$(nproc)
-  #     make -j$(($(nproc)-2))
-  #     make install
-  #   build-packages:
-  #     - libvulkan-dev
-  #   # stage:
-  #   #   - -*
-  qt5:
-    plugin: nil
-    stage-snaps:
-      - kde-frameworks-5-core18
-      - kde-frameworks-5-core18-sdk
-    stage-packages:
-      - libgpm2
-      - freeglut3
-      - libslang2
-      - libsdl2-2.0-0
-      - mesa-utils
-      - libgl1-mesa-glx
-    filesets:
-      library-shared:
-      - '**/lib/**/*.so*'
-    stage:
-      - -bin/bunzip2
-      - -bin/bzcat
-      - -bin/bzip2
-      - -bin/bzip2recover
-      - etc
-      - $library-shared
-    prime:
-      - $library-shared
-      - etc
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
-    plugin: cmake
-    build-snaps:
-      - cmake
-      - kde-frameworks-5-core18
-      - kde-frameworks-5-core18-sdk
-    # organize: 
-    #   '$SNAPCRAFT_PART_INSTALL/bin': '$SNAPCRAFT_PART_INSTALL/bin/yuzu'
-      # '$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5': '$SNAPCRAFT_STAGE/usr/lib/qt'
-    # override-stage: |
-    #   # mkdir -p $SNAPCRAFT_PRIME/bin/yuzu
-    #   # mv $SNAPCRAFT_STAGE/bin/yuzu $SNAPCRAFT_PRIME/bin/yuzu
-    #   # mkdir -p $SNAPCRAFT_STAGE/usr/lib/qt
-    #   # cp -R --symbolic-link "usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5" "$usr/lib/qt"
-    #   for f in $(ls -d $SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5); do ln -sf $f $SNAPCRAFT_STAGE/usr/lib/qt; done
-    #   snapcraftctl stage
-    # override-prime: |
-    #   for f in $(ls -d $SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5); do ln -sf $f $SNAPCRAFT_PRIME/usr/lib/qt; done
-    #   mkdir -p $SNAPCRAFT_PRIME/usr/lib64
-    #   for f in $(ls -d $SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5); do ln -sf $f $SNAPCRAFT_PRIME/usr/lib64/qt; done
-    #   snapcraftctl prime
+    plugin: nil
+    # cmake-parameters: ["-DCMAKE_INSTALL_PREFIX="]
     override-build: |
       pip3 install conan
-      snapcraftctl build
-      cp -R ../src/dist ../install
-      # tried nesting yuzu binary 1 level deeper to see if icons found (below)
-      # mkdir -p $SNAPCRAFT_PART_INSTALL/bin/yuzu-emu
-      # mv $SNAPCRAFT_PART_INSTALL/bin/yuzu $SNAPCRAFT_PART_INSTALL/bin/yuzu-emu
-      # cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-5.12.8/lib/cmake ../src \
-      # cmake ../src \
-      #   -GNinja
-      # ninja
-      # DESTDIR=../install ninja install
+      mkdir build && cd build
+      export DESTDIR=$SNAPCRAFT_PART_INSTALL
+      cmake .. -GNinja
+      ninja
+      ninja install
     build-packages:
       - cmake
       - ninja-build
@@ -93,11 +31,12 @@ parts:
       - libsqlite3-dev
       - libsdl2-dev 
       - python3-setuptools
-      # - qtbase5-dev 
-      # - libqt5opengl5-dev 
-      # - qtwebengine5-dev 
-      # - qtbase5-private-dev 
-      # - libvulkan-dev
+      - qtbase5-dev 
+      - libqt5opengl5-dev 
+      - libqt5svg5
+      - qtwebengine5-dev 
+      - qtbase5-private-dev 
+      - libvulkan-dev
       - python
       - libboost-dev
       - libboost-context-dev
@@ -114,63 +53,74 @@ parts:
       - libxi6
       - libxinerama1
       - libxrandr2
-      - git
-      # - libsdl2-dev
-    # filesets:
-    #   library-shared:
-    #   - '**/lib/**/libSDL2-2.0.so.0'
-    #   # - '**/lib/**/'
+      - qt5-gtk-platformtheme
     stage:
-      - share
-      - bin
-      - dist
-      - lib
-      - -lib/x86_64-linux-gnu/libcom_err.so.2.1
-      # - etc
-      # - '**/lib/**/libSDL2-2.0.so.0'
-      # - $library-shared
+      - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
+      - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
     after:
-      - qt5
-  # desktop-qt5:
-  #   build-packages:
-  #   - build-essential
-  #   - qtbase5-dev
-  #   - dpkg-dev
-  #   make-parameters:
-  #   - FLAVOR=qt5
-  #   plugin: make
-  #   source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-  #   source-subdir: qt
-  #   stage-packages:
-  #   - libxkbcommon0
-  #   - ttf-ubuntu-font-family
-  #   - dmz-cursor-theme
-  #   - light-themes
-  #   - adwaita-icon-theme
-  #   - gnome-themes-standard
-  #   - shared-mime-info
-  #   - libqt5gui5
-  #   - libgdk-pixbuf2.0-0
-  #   - libqt5svg5
-  #   - try:
-  #     - appmenu-qt5
-  #   - locales-all
-  #   - xdg-user-dirs
+      - desktop-qt5
+  desktop-qt5:
+    build-packages:
+    - build-essential
+    - qtbase5-dev
+    - dpkg-dev
+    make-parameters:
+    - FLAVOR=qt5
+    plugin: make
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: qt
+    stage-packages:
+    - libxkbcommon0
+    - ttf-ubuntu-font-family
+    - dmz-cursor-theme
+    - light-themes
+    - adwaita-icon-theme
+    - gnome-themes-standard
+    - shared-mime-info
+    - libqt5gui5
+    - libgtk2.0-0
+    - libgdk-pixbuf2.0-0
+    - libqt5svg5
+    - libgpm2
+    - freeglut3
+    - libslang2
+    - libsdl2-2.0-0
+    - mesa-utils
+    - libgl1-mesa-glx
+    - libopus0
+    - try:
+      - appmenu-qt5
+    - locales-all
+    - xdg-user-dirs
+    - libzip5
+    - libpulse-dev
+    - pulseaudio
+    - libpulse0
 
-    
+plugs:
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+  sound-themes:
+    interface: content
+    target: $SNAP/data-dir/sounds
+    default-provider: gtk-common-themes
 
+  
 apps:
   yuzu:
-    command: bin/yuzu
+    command: bin/desktop-launch $SNAP/usr/local/bin/yuzu
     environment:
       "QT_QPA_PLATFORM_PLUGIN_PATH": "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/plugins"
-      "XDG_RUNTIME_DIR": "/run/user/1000"
       "FONTCONFIG_SYSROOT": $SNAP
       "FONTCONFIG_PATH": $SNAP/etc/fonts/config.d
       "FONTCONFIG_FILE": $SNAP/etc/fonts/fonts.conf
-      "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
-      # "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/qt"
-      # "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/qt:$SNAP/usr/lib64/qt"
+      "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
     plugs:
       - desktop
       - x11
@@ -183,4 +133,5 @@ apps:
       - mir
       - network
       - home
+      - removable-media
   
