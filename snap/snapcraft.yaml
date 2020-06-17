@@ -54,6 +54,7 @@ parts:
       - libxinerama1
       - libxrandr2
       - qt5-gtk-platformtheme
+      - libcanberra-gtk-module
     stage:
       - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
       - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
@@ -96,6 +97,9 @@ parts:
     - libpulse-dev
     - pulseaudio
     - libpulse0
+  plasma-integration:
+      plugin: nil
+      stage-packages: [plasma-integration]
 
 plugs:
   gtk-3-themes:
