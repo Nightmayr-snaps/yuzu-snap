@@ -6,9 +6,11 @@ description: |
   Nintendo Switch Emulator. yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
   It is written in C++ with portability in mind, with builds actively maintained for Windows and Linux.
 
-  Usage: Launch yuzu from your desktop app-launcher or run the command *`yuzu`* from your terminal. If you have already installed yuzu by compiling the source code
-  and installing to your system, run *`snap run yuzu`*. To launch *`yuzu-cmd`* run *`snap run yuzu.yuzu-cmd`* from your terminal.
+  Usage: Launch yuzu from your desktop app-launcher or run the command *`yuzu`* from the terminal. If you have already installed yuzu by 
+  alternative means, use the command *`snap run yuzu`*. To launch *`yuzu-cmd`*, run the command *`snap run yuzu.yuzu-cmd`*.
   Enable the relevant permissions. Yuzu folder location: *`$HOME/snap/yuzu/common/.local/share/yuzu`*
+
+  This snap is not necessarily endorsed or officially maintained by the upstream developers.
 
   Upstream Project: https://yuzu-emu.org/
   snapcraft.yaml Build Definition: https://github.com/Nightmayr/yuzu-snap/blob/master/snap/snapcraft.yaml
