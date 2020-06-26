@@ -17,8 +17,8 @@ description: |
 
   Donate to yuzu: https://yuzu-emu.org/donate
 license: GPL-2.0
-icon: snap/gui/yuzu.svg
-grade: devel # must be 'stable' to release into candidate/stable channels
+icon: snap/gui/yuzu.png
+grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict # use 'strict' once you have the right plugs and slots
 architectures:
   - build-on: amd64
