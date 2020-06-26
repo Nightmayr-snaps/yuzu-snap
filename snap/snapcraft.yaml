@@ -1,16 +1,22 @@
 name: yuzu # you probably want to 'snapcraft register <name>'
 base: core20 # the base snap is the execution environment for this snap
-version: '0-292' # just for humans, typically '1.2+git' or '1.3.2'
+version: '0-293' # just for humans, typically '1.2+git' or '1.3.2'
 summary: yuzu is an experimental open-source emulator for the Nintendo Switch # 79 char long summary
 description: |
   Nintendo Switch Emulator. yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
   It is written in C++ with portability in mind, with builds actively maintained for Windows and Linux.
+
+  Upstream Project: https://yuzu-emu.org/ snapcraft.yaml Build Definition: https://github.com/Nightmayr/yuzu-snap/blob/master/snap/snapcraft.yaml
 license: GPL-2.0
 icon: snap/gui/yuzu.svg
 grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: strict # use 'strict' once you have the right plugs and slots
 architectures:
   - build-on: amd64
+
+package-repositories:
+  - type: apt
+    ppa: graphics-drivers/ppa
 
 parts:
   yuzu:
@@ -60,6 +66,8 @@ parts:
       - libcanberra-gtk-module
       - libvulkan-dev
       - mesa-vulkan-drivers
+      - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package
+      - vulkan-utils
     stage:
       - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
       - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
@@ -97,6 +105,7 @@ parts:
     - try:
       - appmenu-qt5
     - locales-all
+    - qtwayland5
     - xdg-user-dirs
     - libzip5
     - libpulse-dev
@@ -133,6 +142,15 @@ slots:
       name: org.yuzu.yuzu
       bus: session
 
+layout:
+  /usr/share/vulkan:
+    symlink: $SNAP/usr/share/vulkan
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so:
+    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so:
+    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0:
+    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0
 
 apps:
   yuzu:
@@ -142,6 +160,7 @@ apps:
       HOME: "$SNAP_USER_COMMON"
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       KDE_FORK_SLAVES: 1
+      DISABLE_WAYLAND: 1
       # KF5_LIBEXEC_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
       PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5" # Allows kioslave5 to be found, above env variable doesn't work for some reason
     slots:
@@ -155,8 +174,6 @@ apps:
       - opengl
       - joystick
       - unity7
-      - unity8
-      - mir
       - network
       - home
       - removable-media
@@ -166,5 +183,3 @@ apps:
       - block-devices
       - mount-observe
       - upower-observe
-      # - system-files
-
