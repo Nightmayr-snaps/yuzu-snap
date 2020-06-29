@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Build-Snap
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -36,4 +36,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Setup workflow environment
+      run: |
+        apt install jq
+        alias snapcraft="snapcraft --enable-experimental-package-repositories"
+    - name: check version
+      run: ./.github/scripts/version.sh
     - uses: snapcore/action-build@v1
