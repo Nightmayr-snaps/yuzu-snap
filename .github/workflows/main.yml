@@ -38,7 +38,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup workflow environment
       run: |
-        apt install jq
+        sudo apt install jq
         alias snapcraft="snapcraft --enable-experimental-package-repositories"
     - name: check version
       run: ./.github/scripts/version.sh
