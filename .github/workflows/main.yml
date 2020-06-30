@@ -10,9 +10,8 @@ on:
 
 jobs:
   build:
-    # if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
-    if: "! contains(toJSON(github.event.commits.*.msg), '[skip-ci]')"
     runs-on: ubuntu-latest
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
     steps:
     - uses: actions/checkout@v2
     # - name: Setup workflow environment
