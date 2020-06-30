@@ -19,9 +19,19 @@ jobs:
       #   sudo apt install jq
       #   alias snapcraft="snapcraft --enable-experimental-package-repositories"
     - name: Check latest version
-      run: ./.github/scripts/version.sh
+      run: |
+        ./.github/scripts/version.sh
+        echo ::set-output name=build::$BUILD
+        echo ::set-output name=latest-version::$LATEST_VERSION
+        echo ::set-output name=current-version::$CURRENT_VERSION_SNAP
+      id: version-check
     - name: Already latest version - cancelling
       uses: andymckay/cancel-action@0.2
+      if: ${{ steps.version-check.outputs.build }} == false
+    - name: Update snapcraft.yaml version
+    - run: | 
+        sed `s/version:${{ steps.version-check.outputs.current-version}}/version:${{ steps.version-check.outputs.latest-version}}` snap/snapcraft.yaml
+        cat snap/snapcraft.yaml
     - uses: snapcore/action-build@v1
     - name: Test snap
       run: |
@@ -29,10 +39,10 @@ jobs:
         snap run yuzu.yuzu-cmd --version
         # echo ::set-output name=exitcode::$(snap run yuzu.yuzu-cmd --version)
         # add conditional logic for exit code not equal to 0
-    - name: Update yaml version
+    - name: Commit updated yaml version
       run: |
-        git config --global user.name 'Nightmayr'
-        git config --global user.email 'umayr23@gmail.com'
+        git config --global user.name 'Buildbot'
+        git config --global user.email 'buildbot@email.com'
         git commit -am "Updating version [skip ci]"
         git push
 
