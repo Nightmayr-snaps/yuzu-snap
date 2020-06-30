@@ -1,1 +1,5 @@
 *.snap
+# Files created during CI for use as variables
+build
+latest
+current

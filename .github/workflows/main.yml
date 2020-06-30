@@ -21,16 +21,16 @@ jobs:
     - name: Check latest version
       run: |
         ./.github/scripts/version.sh
-        echo ::set-output name=build::$BUILD
-        echo ::set-output name=latest-version::$LATEST_VERSION
-        echo ::set-output name=current-version::$CURRENT_VERSION_SNAP
+        echo ::set-env name=BUILD::$(cat build)
+        echo ::set-env name=LATEST_VERSION::$(cat latest)
+        echo ::set-env name=CURRENT_VERSION::$(cat current)
       id: version-check
     - name: Already latest version - cancelling
       uses: andymckay/cancel-action@0.2
-      if: ${{ steps.version-check.outputs.build }} == false
+      if: ${{ env.BUILD }} == false
     - name: Update snapcraft.yaml version
       run: | 
-        sed `s/version:${{ steps.version-check.outputs.current-version}}/version:${{ steps.version-check.outputs.latest-version}}` snap/snapcraft.yaml
+        sed `s/version:${{ env.CURRENT_VERSION }}/version:${{ env.LATEST_VERSION }}` snap/snapcraft.yaml
         cat snap/snapcraft.yaml
     - uses: snapcore/action-build@v1
     - name: Test snap
