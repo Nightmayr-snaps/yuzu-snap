@@ -27,7 +27,7 @@ jobs:
       id: version-check
     - name: Already latest version - cancelling
       uses: andymckay/cancel-action@0.2
-      if: env.BUILD == false
+      if: ${{ env.BUILD == false }}
     - name: Update snapcraft.yaml version
       run: | 
         sed `s/version:${{ env.CURRENT_VERSION }}/version:${{ env.LATEST_VERSION }}` snap/snapcraft.yaml
