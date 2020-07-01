@@ -33,7 +33,7 @@ parts:
     source-tag: mainline-$SNAPCRAFT_PROJECT_VERSION
     plugin: nil
     override-build: |
-      apt install -y distro-info-data
+      apt install -y lsb-release
       pip3 install conan
       mkdir build && cd build
       export DESTDIR=$SNAPCRAFT_PART_INSTALL
