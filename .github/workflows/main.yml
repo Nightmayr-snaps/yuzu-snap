@@ -1,11 +1,9 @@
 name: Build-Snap
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
+  schedule:
+    - cron: '* * * * *'
   push:
-    branches: [ master ]
-  pull_request:
     branches: [ master ]
 
 jobs:
@@ -14,10 +12,6 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[ci-skip]')"
     steps:
     - uses: actions/checkout@v2
-    # - name: Setup workflow environment
-      # run: |
-      #   sudo apt install jq
-      #   alias snapcraft="snapcraft --enable-experimental-package-repositories"
     - name: Check latest version
       run: |
         ./.github/scripts/version.sh
@@ -33,16 +27,18 @@ jobs:
         sed -i "s/version: '${{ env.CURRENT_VERSION }}'/version: '${{ env.LATEST_VERSION }}'/g" snap/snapcraft.yaml
     - uses: snapcore/action-build@v1
       id: snapcraft
-    - name: Test snap
+    - name: Testing snap
       run: |
         sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
         snap run yuzu.yuzu-cmd --version
-        # echo ::set-output name=exitcode::$(snap run yuzu.yuzu-cmd --version)
-        # add conditional logic for exit code not equal to 0
-    # - name: Commit updated yaml version
-    #   run: |
-    #     git config --global user.name 'Buildbot'
-    #     git config --global user.email 'buildbot@email.com'
-    #     git commit -am "Updating version [skip ci]"
-    #     git push
-
+    - uses: snapcore/action-publish@v1
+      with:
+        store_login: ${{ secrets.STORE_LOGIN }}
+        snap: ${{ step.snapcraft.outputs.snap }}
+        release: stable
+    - name: Committing updated snapcraft.yaml
+      run: |
+        git config --global user.name 'Buildbot'
+        git config --global user.email 'buildbot@email.com'
+        git commit -am "Updating version [ci-skip]"
+        git push origin master
