@@ -33,7 +33,9 @@ parts:
     source-tag: mainline-$SNAPCRAFT_PROJECT_VERSION
     plugin: nil
     override-build: |
-      apt install -y lsb-release
+      if [ ! -f /usr/bin/lsb_release ]; then
+        apt install -y lsb-release
+      fi
       pip3 install conan
       mkdir build && cd build
       export DESTDIR=$SNAPCRAFT_PART_INSTALL
@@ -67,7 +69,6 @@ parts:
       - libopus-dev
       - zlib1g-dev
       - libzstd-dev
-      # - distro-info-data # for snapcraft with lxd backend
     stage-packages:
       - libsdl2-2.0-0
       - libxi6
