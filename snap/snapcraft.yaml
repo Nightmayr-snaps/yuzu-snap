@@ -66,6 +66,7 @@ parts:
       - libopus-dev
       - zlib1g-dev
       - libzstd-dev
+      - distro-info-data # for snapcraft with lxd backend
     stage-packages:
       - libsdl2-2.0-0
       - libxi6
