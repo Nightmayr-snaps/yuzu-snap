@@ -23,9 +23,9 @@ confinement: strict # use 'strict' once you have the right plugs and slots
 architectures:
   - build-on: amd64
 
-package-repositories:
-  - type: apt
-    ppa: graphics-drivers/ppa
+# package-repositories:
+#   - type: apt
+#     ppa: graphics-drivers/ppa
 
 parts:
   yuzu:
