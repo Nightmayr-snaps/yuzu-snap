@@ -34,7 +34,7 @@ jobs:
     - uses: snapcore/action-publish@v1
       with:
         store_login: ${{ secrets.STORE_LOGIN }}
-        snap: ${{ step.snapcraft.outputs.snap }}
+        snap: ${{ steps.snapcraft.outputs.snap }}
         release: stable
     - name: Committing updated snapcraft.yaml
       run: |
