@@ -30,6 +30,7 @@ jobs:
       uses: andymckay/cancel-action@0.2
     - name: Update snapcraft.yaml version
       run: | 
+        cat snap/snapcraft.yaml
         sed "s/version: '${{ env.CURRENT_VERSION }}'/version: '${{ env.LATEST_VERSION }}'/g" snap/snapcraft.yaml
         cat snap/snapcraft.yaml
     - uses: snapcore/action-build@v1
