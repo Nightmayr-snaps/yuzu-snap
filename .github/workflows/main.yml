@@ -12,6 +12,8 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[ci-skip]')"
     steps:
     - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.PAT }}
     - name: Check latest version
       run: |
         ./.github/scripts/version.sh
@@ -31,14 +33,15 @@ jobs:
       run: |
         sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
         snap run yuzu.yuzu-cmd --version
+    - name: Committing updated snapcraft.yaml #Move to be after publish once pushing confirmed to work
+      run: |
+        git config --global user.name 'Buildbot'
+        git config --global user.email 'umayr23@gmail.com'
+        git commit -am "Updating version [ci-skip]"
+        git push origin master
     - uses: snapcore/action-publish@v1
       with:
         store_login: ${{ secrets.STORE_LOGIN }}
         snap: ${{ steps.snapcraft.outputs.snap }}
         release: stable
-    - name: Committing updated snapcraft.yaml
-      run: |
-        git config --global user.name 'Buildbot'
-        git config --global user.email 'buildbot@email.com'
-        git commit -am "Updating version [ci-skip]"
-        git push origin master
+
