@@ -38,10 +38,10 @@ jobs:
         snap run yuzu.yuzu-cmd --version
         # echo ::set-output name=exitcode::$(snap run yuzu.yuzu-cmd --version)
         # add conditional logic for exit code not equal to 0
-    - name: Commit updated yaml version
-      run: |
-        git config --global user.name 'Buildbot'
-        git config --global user.email 'buildbot@email.com'
-        git commit -am "Updating version [skip ci]"
-        git push
+    # - name: Commit updated yaml version
+    #   run: |
+    #     git config --global user.name 'Buildbot'
+    #     git config --global user.email 'buildbot@email.com'
+    #     git commit -am "Updating version [skip ci]"
+    #     git push
 
