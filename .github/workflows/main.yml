@@ -1,39 +1,44 @@
-# This is a basic workflow to help you get started with Actions
+name: Build-Snap
 
-name: CI
-
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
+  schedule:
+    - cron: '* * * * *'
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-# jobs:
-#   # This workflow contains a single job called "build"
-#   build:
-#     # The type of runner that the job will run on
-#     runs-on: ubuntu-latest
-
-#     # Steps represent a sequence of tasks that will be executed as part of the job
-#     steps:
-#     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-#     - uses: actions/checkout@v2
-
-#     # Runs a single command using the runners shell
-#     - name: Run a one-line script
-#       run: echo Hello, world!
-
-#     # Runs a set of commands using the runners shell
-#     - name: Run a multi-line script
-#       run: |
-#         echo Add other actions to build,
-#         echo test, and deploy your project.
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[ci-skip]')"
     steps:
     - uses: actions/checkout@v2
+    - name: Check latest version
+      run: |
+        ./.github/scripts/version.sh
+        echo ::set-env name=BUILD::$(cat build)
+        echo ::set-env name=LATEST_VERSION::$(cat latest)
+        echo ::set-env name=CURRENT_VERSION::$(cat current)
+      id: version-check
+    - name: Already latest version - cancelling
+      if: env.BUILD == 'false'
+      uses: andymckay/cancel-action@0.2
+    - name: Update snapcraft.yaml version
+      run: | 
+        sed -i "s/version: '${{ env.CURRENT_VERSION }}'/version: '${{ env.LATEST_VERSION }}'/g" snap/snapcraft.yaml
     - uses: snapcore/action-build@v1
+      id: snapcraft
+    - name: Testing snap
+      run: |
+        sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+        snap run yuzu.yuzu-cmd --version
+    - uses: snapcore/action-publish@v1
+      with:
+        store_login: ${{ secrets.STORE_LOGIN }}
+        snap: ${{ step.snapcraft.outputs.snap }}
+        release: stable
+    - name: Committing updated snapcraft.yaml
+      run: |
+        git config --global user.name 'Buildbot'
+        git config --global user.email 'buildbot@email.com'
+        git commit -am "Updating version [ci-skip]"
+        git push origin master
