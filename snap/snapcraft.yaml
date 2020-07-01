@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '0-295'
+version: '0-297'
 summary: yuzu is an experimental open-source emulator for the Nintendo Switch # 79 char long summary
 description: |
   Nintendo Switch Emulator. yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -33,6 +33,7 @@ parts:
     source-tag: mainline-$SNAPCRAFT_PROJECT_VERSION
     plugin: nil
     override-build: |
+      sudo mv /usr/bin/lsb_release /usr/bin/lsb_release_back
       pip3 install conan
       mkdir build && cd build
       export DESTDIR=$SNAPCRAFT_PART_INSTALL
@@ -66,7 +67,7 @@ parts:
       - libopus-dev
       - zlib1g-dev
       - libzstd-dev
-      - distro-info-data # for snapcraft with lxd backend
+      # - distro-info-data # for snapcraft with lxd backend
     stage-packages:
       - libsdl2-2.0-0
       - libxi6
