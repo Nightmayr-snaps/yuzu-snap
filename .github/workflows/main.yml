@@ -3,7 +3,7 @@ name: Build-Snap
 on:
   schedule:
     - cron: '0 */5 * * *'
-    - cron: '30 12 * * *'
+    - cron: '15 13 * * *'
   push:
     branches: [ master ]
 
