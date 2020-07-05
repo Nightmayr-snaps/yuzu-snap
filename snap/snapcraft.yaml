@@ -1,10 +1,12 @@
 name: yuzu
 base: core20
 version: '0-301'
-summary: yuzu is an experimental open-source emulator for the Nintendo Switch # 79 char long summary
+summary: Nintendo Switch Emulator
 description: |
-  Nintendo Switch Emulator. yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
+  yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
   It is written in C++ with portability in mind, with builds actively maintained for Windows and Linux.
+
+  yuzu only emulates a subset of Switch hardware and therefore most commercial games do not run at full speed or are not fully functional.
 
   Usage: Launch yuzu from your desktop app-launcher or run the command *`yuzu`* from the terminal. If you have already installed yuzu by 
   alternative means, use the command *`snap run yuzu`*. To launch *`yuzu-cmd`*, run the command *`snap run yuzu.yuzu-cmd`*.
@@ -39,7 +41,7 @@ parts:
       pip3 install conan
       mkdir build && cd build
       export DESTDIR=$SNAPCRAFT_PART_INSTALL
-      cmake .. -GNinja
+      cmake .. -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON -GNinja
       ninja
       ninja install
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/yuzu.desktop
