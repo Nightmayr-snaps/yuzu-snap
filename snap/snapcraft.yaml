@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '0-338'
+version: '0-347'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -41,7 +41,7 @@ parts:
       pip3 install conan
       mkdir build && cd build
       export DESTDIR=$SNAPCRAFT_PART_INSTALL
-      cmake .. -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON -GNinja
+      cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON -GNinja
       ninja
       ninja install
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/yuzu.desktop
@@ -77,15 +77,18 @@ parts:
       - libxinerama1
       - libxrandr2
       - qt5-gtk-platformtheme
-      - libboost-context-dev
+      - libboost-context1.71.0
       - libcanberra-gtk-module
-      - libvulkan-dev
+      - libvulkan1
       - mesa-vulkan-drivers
       - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
       - vulkan-utils
+      - libzip5
+      - libpulse0
     stage:
       - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
       - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
+      - -usr/share/doc
     after:
       - desktop-qt5
   desktop-qt5:
@@ -113,7 +116,6 @@ parts:
     - libgpm2
     - freeglut3
     - libslang2
-    - libsdl2-2.0-0
     - mesa-utils
     - libgl1-mesa-glx
     - libopus0
@@ -122,19 +124,50 @@ parts:
     - locales-all
     - qtwayland5
     - xdg-user-dirs
-    - libzip5
-    - libpulse-dev
-    - libpulse0
     override-prime: |
       snapcraftctl prime
       sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
       sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+    stage:
+      - -usr/share/doc
   plasma-integration:
     plugin: nil
     stage-packages:
       - breeze-icon-theme
       - kde-style-breeze
       - plasma-integration
+    stage:
+      - -usr/share/doc
+  desktop-settings-packages:
+    plugin: nil
+    build-packages:
+    - libglib2.0-bin
+    stage-packages:
+    - gsettings-desktop-schemas
+    - ubuntu-settings
+    prime:
+    - usr/share/glib-2.0/schemas/*
+    after: [ desktop-qt5 ]
+  desktop-settings-build:
+    plugin: nil
+    after: [ desktop-settings-packages ]
+    override-prime: |
+      set -eux
+      glib-compile-schemas usr/share/glib-2.0/schemas
+  cleanup:
+    after:  # Make this part run last; list all your other parts here
+      - yuzu
+      - desktop-qt5
+      - plasma-integration
+      - desktop-settings-build
+    plugin: nil
+    build-snaps:  # List all content-snaps and base snaps you're using here
+      - core20
+    override-prime: |
+      set -eux
+      for snap in "core20"; do  # List all content-snaps and base snaps you're using here
+        cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
+      done
 
 plugs:
   gtk-3-themes:
