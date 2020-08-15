@@ -78,7 +78,6 @@ parts:
       - libxrandr2
       - qt5-gtk-platformtheme
       - libboost-context1.71.0
-      - libcanberra-gtk-module
       - libvulkan1
       - mesa-vulkan-drivers
       - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
