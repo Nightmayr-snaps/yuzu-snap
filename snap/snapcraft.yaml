@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '0-347'
+version: '0-346'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -46,50 +46,53 @@ parts:
       ninja install
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/yuzu.desktop
     build-packages:
-      - cmake
-      - ninja-build
-      - build-essential
-      - python3-pip
-      - sqlite3
-      - libsqlite3-dev
-      - libsdl2-dev 
-      - python3-setuptools
-      - qtbase5-dev 
-      - libqt5opengl5-dev 
-      - libqt5svg5
-      - qtwebengine5-dev 
-      - qtbase5-private-dev 
-      - libvulkan-dev
-      - python
-      - libboost-dev
-      - libboost-context-dev
-      - libfmt-dev
-      - libzip-dev
-      - liblz4-dev 
-      - libmbedtls-dev
-      - libssl-dev
-      - libopus-dev
-      - zlib1g-dev
-      - libzstd-dev
+    - cmake
+    - ninja-build
+    - build-essential
+    - python3-pip
+    - sqlite3
+    - libsqlite3-dev
+    - libsdl2-dev 
+    - python3-setuptools
+    - qtbase5-dev 
+    - libqt5opengl5-dev 
+    - libqt5svg5
+    - qtwebengine5-dev 
+    - qtbase5-private-dev 
+    - libvulkan-dev
+    - python
+    - libboost-dev
+    - libboost-context-dev
+    - libfmt-dev
+    - libzip-dev
+    - liblz4-dev 
+    - libmbedtls-dev
+    - libssl-dev
+    - libopus-dev
+    - zlib1g-dev
+    - libzstd-dev
     stage-packages:
-      - libsdl2-2.0-0
-      - libxi6
-      - libxinerama1
-      - libxrandr2
-      - qt5-gtk-platformtheme
-      - libboost-context1.71.0
-      - libvulkan1
-      - mesa-vulkan-drivers
-      - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
-      - vulkan-utils
-      - libzip5
-      - libpulse0
+    - libsdl2-2.0-0
+    - libxi6
+    - libxinerama1
+    - libxrandr2
+    - qt5-gtk-platformtheme
+    - libboost-context1.71.0
+    - libvulkan1
+    - mesa-vulkan-drivers
+    - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
+    - vulkan-utils
+    - libzip5
+    - libpulse0
+    - libgl1-mesa-glx
+    - libopus0
+    - mesa-utils
     stage:
-      - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
-      - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
-      - -usr/share/doc
+    - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
+    - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
+    - -usr/share/doc
     after:
-      - desktop-qt5
+    - desktop-qt5
   desktop-qt5:
     build-packages:
     - build-essential
@@ -115,9 +118,6 @@ parts:
     - libgpm2
     - freeglut3
     - libslang2
-    - mesa-utils
-    - libgl1-mesa-glx
-    - libopus0
     - try:
       - appmenu-qt5
     - locales-all
@@ -132,11 +132,11 @@ parts:
   plasma-integration:
     plugin: nil
     stage-packages:
-      - breeze-icon-theme
-      - kde-style-breeze
-      - plasma-integration
+    - breeze-icon-theme
+    - kde-style-breeze
+    - plasma-integration
     stage:
-      - -usr/share/doc
+    - -usr/share/doc
   desktop-settings-packages:
     plugin: nil
     build-packages:
@@ -204,20 +204,20 @@ apps:
       # KF5_LIBEXEC_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
       PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5" # Allows kioslave5 to be found, above commented env variable doesn't work for some reason  
     plugs:
-      - desktop
-      - desktop-legacy
-      - x11
-      - wayland
-      - audio-playback
-      - opengl
-      - joystick
-      - unity7
-      - network
-      - home
-      - removable-media
-      - gsettings
-      - hardware-observe
-      - mount-observe
+    - desktop
+    - desktop-legacy
+    - x11
+    - wayland
+    - audio-playback
+    - opengl
+    - joystick
+    - unity7
+    - network
+    - home
+    - removable-media
+    - gsettings
+    - hardware-observe
+    - mount-observe
   yuzu-cmd:
     command: usr/local/bin/yuzu-cmd
     environment:
@@ -225,16 +225,16 @@ apps:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       DISABLE_WAYLAND: 1 
     plugs:
-      - x11
-      - wayland
-      - audio-playback
-      - opengl
-      - joystick
-      - network
-      - home
-      - removable-media
-      - hardware-observe
-      - mount-observe
+    - x11
+    - wayland
+    - audio-playback
+    - opengl
+    - joystick
+    - network
+    - home
+    - removable-media
+    - hardware-observe
+    - mount-observe
   yuzu-tester:
     command: usr/local/bin/yuzu-tester
     environment:
