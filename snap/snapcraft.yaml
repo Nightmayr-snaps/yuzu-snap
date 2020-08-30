@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '0-352'
+version: '0-363'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -41,7 +41,7 @@ parts:
       pip3 install conan
       mkdir build && cd build
       export DESTDIR=$SNAPCRAFT_PART_INSTALL
-      cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON -GNinja
+      cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON DUSE_DISCORD_PRESENCE=ON -DENABLE_QT_TRANSLATION=ON -GNinja
       ninja
       ninja install
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/yuzu.desktop
