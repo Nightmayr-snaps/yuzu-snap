@@ -71,6 +71,8 @@ parts:
     - libopus-dev
     - zlib1g-dev
     - libzstd-dev
+    - qttools5-dev
+    - qttools5-dev-tools
     stage-packages:
     - libsdl2-2.0-0
     - libxi6
