@@ -216,6 +216,7 @@ apps:
     - joystick
     - unity7
     - network
+    - network-bind
     - home
     - removable-media
     - gsettings
@@ -234,6 +235,7 @@ apps:
     - opengl
     - joystick
     - network
+    - network-bind
     - home
     - removable-media
     - hardware-observe
