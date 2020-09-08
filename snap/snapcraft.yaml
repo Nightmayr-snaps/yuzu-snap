@@ -220,6 +220,7 @@ apps:
     - gsettings
     - hardware-observe
     - mount-observe
+    - bluez
   yuzu-cmd:
     command: usr/local/bin/yuzu-cmd
     environment:
@@ -238,6 +239,7 @@ apps:
     - removable-media
     - hardware-observe
     - mount-observe
+    - bluez
   yuzu-tester:
     command: usr/local/bin/yuzu-tester
     environment:
