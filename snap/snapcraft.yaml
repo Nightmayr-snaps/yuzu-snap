@@ -61,7 +61,6 @@ parts:
     - qtbase5-private-dev 
     - libvulkan-dev
     - python
-    - libboost-dev
     - libfmt-dev
     - libzip-dev
     - liblz4-dev 
