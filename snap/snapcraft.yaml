@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '0-364'
+version: '0-371'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -62,7 +62,6 @@ parts:
     - libvulkan-dev
     - python
     - libboost-dev
-    - libboost-context-dev
     - libfmt-dev
     - libzip-dev
     - liblz4-dev 
@@ -79,7 +78,6 @@ parts:
     - libxinerama1
     - libxrandr2
     - qt5-gtk-platformtheme
-    - libboost-context1.71.0
     - libvulkan1
     - mesa-vulkan-drivers
     - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
