@@ -33,17 +33,14 @@ parts:
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
     source-tag: mainline-$SNAPCRAFT_PROJECT_VERSION
-    plugin: nil
+    plugin: cmake
+    cmake-parameters: [-DCMAKE_BUILD_TYPE=Release, -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON, -DUSE_DISCORD_PRESENCE=ON, -DENABLE_QT_TRANSLATION=ON]
     override-build: |
       if [ ! -f /usr/bin/lsb_release ]; then
         apt install -y lsb-release
       fi
       pip3 install conan
-      mkdir build && cd build
-      export DESTDIR=$SNAPCRAFT_PART_INSTALL
-      cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON -DUSE_DISCORD_PRESENCE=ON -DENABLE_QT_TRANSLATION=ON -GNinja
-      ninja
-      ninja install
+      snapcraftctl build
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/yuzu.desktop
     build-packages:
     - cmake
@@ -170,7 +167,7 @@ apps:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
-      GIO_MODULE_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gio/modules"
+      # GIO_MODULE_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gio/modules"
       # KF5_LIBEXEC_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
       PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5" # Allows kioslave5 to be found, above commented env variable doesn't work for some reason  
     plugs:
