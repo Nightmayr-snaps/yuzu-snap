@@ -33,61 +33,66 @@ parts:
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
     source-tag: mainline-$SNAPCRAFT_PROJECT_VERSION
-    plugin: nil
+    plugin: cmake
+    cmake-parameters: [-DCMAKE_BUILD_TYPE=Release, -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON, -DUSE_DISCORD_PRESENCE=ON, -DENABLE_QT_TRANSLATION=ON]
+    override-pull: |
+      snapcraftctl pull
+      git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
     override-build: |
       if [ ! -f /usr/bin/lsb_release ]; then
         apt install -y lsb-release
       fi
       pip3 install conan
-      mkdir build && cd build
-      export DESTDIR=$SNAPCRAFT_PART_INSTALL
-      cmake .. -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON -GNinja
-      ninja
-      ninja install
+      snapcraftctl build
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/yuzu.desktop
     build-packages:
-      - cmake
-      - ninja-build
-      - build-essential
-      - python3-pip
-      - sqlite3
-      - libsqlite3-dev
-      - libsdl2-dev 
-      - python3-setuptools
-      - qtbase5-dev 
-      - libqt5opengl5-dev 
-      - libqt5svg5
-      - qtwebengine5-dev 
-      - qtbase5-private-dev 
-      - libvulkan-dev
-      - python
-      - libboost-dev
-      - libboost-context-dev
-      - libfmt-dev
-      - libzip-dev
-      - liblz4-dev 
-      - libmbedtls-dev
-      - libssl-dev
-      - libopus-dev
-      - zlib1g-dev
-      - libzstd-dev
+    - cmake
+    - ninja-build
+    - build-essential
+    - python3-pip
+    - sqlite3
+    - libsqlite3-dev
+    - libsdl2-dev 
+    - python3-setuptools
+    - qtbase5-dev 
+    - libqt5opengl5-dev 
+    - libqt5svg5
+    - qtwebengine5-dev 
+    - qtbase5-private-dev 
+    - libvulkan-dev
+    - python
+    - libfmt-dev
+    - libzip-dev
+    - liblz4-dev 
+    - libmbedtls-dev
+    - libssl-dev
+    - libopus-dev
+    - zlib1g-dev
+    - libzstd-dev
+    - qttools5-dev
+    - qttools5-dev-tools
     stage-packages:
-      - libsdl2-2.0-0
-      - libxi6
-      - libxinerama1
-      - libxrandr2
-      - qt5-gtk-platformtheme
-      - libboost-context-dev
-      - libcanberra-gtk-module
-      - libvulkan-dev
-      - mesa-vulkan-drivers
-      - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
-      - vulkan-utils
+    - libsdl2-2.0-0
+    - libxi6
+    - libxinerama1
+    - libxrandr2
+    - qt5-gtk-platformtheme
+    - libvulkan1
+    - mesa-vulkan-drivers
+    - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
+    - vulkan-utils
+    - libzip5
+    - libpulse0
+    - libgl1-mesa-glx
+    - libopus0
+    - mesa-utils
     stage:
-      - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
-      - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
+    - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
+    - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
+    - -usr/share/doc
     after:
-      - desktop-qt5
+    - patches
+    - desktop-qt5
   desktop-qt5:
     build-packages:
     - build-essential
@@ -113,28 +118,31 @@ parts:
     - libgpm2
     - freeglut3
     - libslang2
-    - libsdl2-2.0-0
-    - mesa-utils
-    - libgl1-mesa-glx
-    - libopus0
     - try:
       - appmenu-qt5
     - locales-all
     - qtwayland5
     - xdg-user-dirs
-    - libzip5
-    - libpulse-dev
-    - libpulse0
     override-prime: |
       snapcraftctl prime
       sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
       sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+    stage:
+      - -usr/share/doc
   plasma-integration:
     plugin: nil
     stage-packages:
-      - breeze-icon-theme
-      - kde-style-breeze
-      - plasma-integration
+    - breeze-icon-theme
+    - kde-style-breeze
+    - plasma-integration
+    stage:
+    - -usr/share/doc
+  patches:
+    plugin: dump
+    source: snap/local/patches
+    source-type: local
+    prime:
+      - -*
 
 plugs:
   gtk-3-themes:
@@ -169,23 +177,26 @@ apps:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
+      # GIO_MODULE_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gio/modules"
       # KF5_LIBEXEC_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
       PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5" # Allows kioslave5 to be found, above commented env variable doesn't work for some reason  
     plugs:
-      - desktop
-      - desktop-legacy
-      - x11
-      - wayland
-      - audio-playback
-      - opengl
-      - joystick
-      - unity7
-      - network
-      - home
-      - removable-media
-      - gsettings
-      - hardware-observe
-      - mount-observe
+    - desktop
+    - desktop-legacy
+    - x11
+    - wayland
+    - audio-playback
+    - opengl
+    - joystick
+    - unity7
+    - network
+    - network-bind
+    - home
+    - removable-media
+    - gsettings
+    - hardware-observe
+    - mount-observe
+    - bluez
   yuzu-cmd:
     command: usr/local/bin/yuzu-cmd
     environment:
@@ -193,16 +204,18 @@ apps:
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       DISABLE_WAYLAND: 1 
     plugs:
-      - x11
-      - wayland
-      - audio-playback
-      - opengl
-      - joystick
-      - network
-      - home
-      - removable-media
-      - hardware-observe
-      - mount-observe
+    - x11
+    - wayland
+    - audio-playback
+    - opengl
+    - joystick
+    - network
+    - network-bind
+    - home
+    - removable-media
+    - hardware-observe
+    - mount-observe
+    - bluez
   yuzu-tester:
     command: usr/local/bin/yuzu-tester
     environment:
