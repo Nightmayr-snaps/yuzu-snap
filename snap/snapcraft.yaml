@@ -35,6 +35,9 @@ parts:
     source-tag: mainline-$SNAPCRAFT_PROJECT_VERSION
     plugin: cmake
     cmake-parameters: [-DCMAKE_BUILD_TYPE=Release, -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON, -DUSE_DISCORD_PRESENCE=ON, -DENABLE_QT_TRANSLATION=ON]
+    override-pull: |
+      snapcraftctl pull
+      git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
     override-build: |
       if [ ! -f /usr/bin/lsb_release ]; then
         apt install -y lsb-release
@@ -88,6 +91,7 @@ parts:
     - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
     - -usr/share/doc
     after:
+    - patches
     - desktop-qt5
   desktop-qt5:
     build-packages:
@@ -133,6 +137,12 @@ parts:
     - plasma-integration
     stage:
     - -usr/share/doc
+  patches:
+    plugin: dump
+    source: snap/local/patches
+    source-type: local
+    prime:
+      - -*
 
 plugs:
   gtk-3-themes:

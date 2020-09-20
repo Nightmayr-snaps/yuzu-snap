@@ -1,0 +1,13 @@
+diff --git a/CMakeModules/GenerateSCMRev.cmake b/CMakeModules/GenerateSCMRev.cmake
+index 311ba1c2e..34ab36450 100644
+--- a/CMakeModules/GenerateSCMRev.cmake
++++ b/CMakeModules/GenerateSCMRev.cmake
+@@ -12,7 +12,7 @@ find_package(Git QUIET PATHS "${GIT_EXECUTABLE}")
+ # generate git/build information
+ include(GetGitRevisionDescription)
+ get_git_head_revision(GIT_REF_SPEC GIT_REV)
+-git_describe(GIT_DESC --always --long --dirty)
++git_describe(GIT_DESC --always --long)
+ git_branch_name(GIT_BRANCH)
+ get_timestamp(BUILD_DATE)
+ 
