@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '0-393'
+version: '0-398'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -140,6 +140,12 @@ parts:
     source-type: local
     prime:
       - -*
+  launchers:
+    plugin: dump
+    source: snap/local/launchers
+    source-type: local
+    organize:
+      '*': bin/
 
 plugs:
   gtk-3-themes:
@@ -167,15 +173,16 @@ layout:
 
 apps:
   yuzu:
-    command: bin/desktop-launch $SNAP/usr/local/bin/yuzu
+    command: usr/local/bin/yuzu
+    command-chain:
+    - "bin/desktop-launch"
+    - "bin/vulkan-icd-files"
     desktop: usr/local/share/applications/yuzu.desktop
     environment:
       HOME: "$SNAP_USER_COMMON"
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
-      # Vulkan ICD file path specified for Nvidia due to being in a different location to the Intel and Radeon ICD files
-      VK_ICD_FILENAMES: "/var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon.x86_64.json:$SNAP/usr/share/vulkan/icd.d/intel_icd.x86_64.json"
       # KF5_LIBEXEC_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
       PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5" # Allows kioslave5 to be found, above commented env variable doesn't work for some reason  
     plugs:
