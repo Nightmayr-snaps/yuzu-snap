@@ -30,7 +30,7 @@ parts:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
     source-tag: mainline-$SNAPCRAFT_PROJECT_VERSION
     plugin: cmake
-    cmake-parameters: [-DCMAKE_BUILD_TYPE=Release, -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON, -DUSE_DISCORD_PRESENCE=ON, -DENABLE_QT_TRANSLATION=ON]
+    cmake-parameters: [-DCMAKE_BUILD_TYPE=Release, -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON, -DUSE_DISCORD_PRESENCE=ON, -DENABLE_QT_TRANSLATION=ON, -DYUZU_USE_QT_WEB_ENGINE=ON]
     cmake-generator: Ninja #Can be either Ninja or Unix Makefiles (default).
     override-pull: |
       snapcraftctl pull
@@ -76,16 +76,19 @@ parts:
     - qt5-gtk-platformtheme
     - libvulkan1
     - mesa-vulkan-drivers
-    - nvidia-driver-440 # seems to fix nvidia vulkan at the cost of adding 100MB+ to final package, may be able to cleanup unecessary files?
     - vulkan-utils
     - libzip5
     - libpulse0
     - libgl1-mesa-glx
     - libopus0
     - mesa-utils
+    - xdg-utils
+    - libqt5webengine5
+    - libqt5webenginewidgets5
     stage:
     - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
     - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
+    - -lib/x86_64-linux-gnu/libz.so.1.2.11
     - -usr/share/doc
     after:
     - patches
@@ -140,6 +143,12 @@ parts:
     source-type: local
     prime:
       - -*
+  launchers:
+    plugin: dump
+    source: snap/local/launchers
+    source-type: local
+    organize:
+      '*': bin/
 
 plugs:
   gtk-3-themes:
@@ -162,19 +171,23 @@ layout:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0:
-    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0
+  # /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0:
+  #   symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libGLX_nvidia.so.0
+  /usr/share/qt5:
+    symlink: $SNAP/usr/share/qt5
 
 apps:
   yuzu:
-    command: bin/desktop-launch $SNAP/usr/local/bin/yuzu
+    command: usr/local/bin/yuzu
+    command-chain:
+    - "bin/desktop-launch"
+    - "bin/vulkan-icd-files"
     desktop: usr/local/share/applications/yuzu.desktop
     environment:
       HOME: "$SNAP_USER_COMMON"
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
-      # GIO_MODULE_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gio/modules"
       # KF5_LIBEXEC_DIR: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
       PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5" # Allows kioslave5 to be found, above commented env variable doesn't work for some reason  
     plugs:
@@ -194,8 +207,11 @@ apps:
     - hardware-observe
     - mount-observe
     - bluez
+    - browser-support
   yuzu-cmd:
     command: usr/local/bin/yuzu-cmd
+    command-chain:
+    - "bin/vulkan-icd-files"
     environment:
       HOME: "$SNAP_USER_COMMON"
       LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
@@ -213,6 +229,7 @@ apps:
     - hardware-observe
     - mount-observe
     - bluez
+    - browser-support
   yuzu-tester:
     command: usr/local/bin/yuzu-tester
     environment:
