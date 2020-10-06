@@ -206,6 +206,7 @@ apps:
     - mount-observe
     - bluez
     - browser-support
+    - screen-inhibit-control
   yuzu-cmd:
     command: usr/local/bin/yuzu-cmd
     command-chain:
@@ -228,6 +229,7 @@ apps:
     - mount-observe
     - bluez
     - browser-support
+    - screen-inhibit-control
   yuzu-tester:
     command: usr/local/bin/yuzu-tester
     environment:
