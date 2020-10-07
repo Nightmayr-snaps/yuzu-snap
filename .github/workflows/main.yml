@@ -25,7 +25,7 @@ jobs:
         echo "CURRENT_VERSION=$(cat current)" >> $GITHUB_ENV
       id: version-check
     - name: Already latest version - cancelling
-      if: $BUILD == 'false'
+      if: env.BUILD == 'false'
       uses: andymckay/cancel-action@0.2
     - name: Update snapcraft.yaml version
       run: | 
