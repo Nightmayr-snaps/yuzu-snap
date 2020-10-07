@@ -6,6 +6,8 @@ on:
     - cron: '15 13 * * *'
   push:
     branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
@@ -18,16 +20,16 @@ jobs:
     - name: Check latest version
       run: |
         ./.github/scripts/version.sh
-        echo ::set-env name=BUILD::$(cat build)
-        echo ::set-env name=LATEST_VERSION::$(cat latest)
-        echo ::set-env name=CURRENT_VERSION::$(cat current)
+        echo "BUILD=$(cat build)" >> $GITHUB_ENV
+        echo "LATEST_VERSION=$(cat latest)" >> $GITHUB_ENV
+        echo "CURRENT_VERSION=$(cat current)" >> $GITHUB_ENV
       id: version-check
     - name: Already latest version - cancelling
-      if: env.BUILD == 'false'
+      if: $BUILD == 'false'
       uses: andymckay/cancel-action@0.2
     - name: Update snapcraft.yaml version
       run: | 
-        sed -i "s/version: '${{ env.CURRENT_VERSION }}'/version: '${{ env.LATEST_VERSION }}'/g" snap/snapcraft.yaml
+        sed -i "s/version: '$CURRENT_VERSION'/version: '$LATEST_VERSION'/g" snap/snapcraft.yaml
     - uses: snapcore/action-build@v1
       id: snapcraft
     - name: Testing snap
@@ -41,7 +43,7 @@ jobs:
         release: stable
     - name: Committing updated snapcraft.yaml
       run: |
-        git config --global user.name 'Buildbot'
+        git config --global user.name 'Nightmayr'
         git config --global user.email 'umayr23@gmail.com'
         git commit -am "Updating version [ci-skip]"
         git push origin master
