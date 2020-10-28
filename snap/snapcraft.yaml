@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '0-421'
+version: '0-422'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -75,9 +75,9 @@ parts:
     - qttools5-dev
     - qttools5-dev-tools
     - libavcodec-dev
-    - libavcodec-extra
+    - libavformat-dev
+    - libavutil-dev
     - libswscale-dev
-#     - ffmpeg
     stage-packages:
     - libsdl2-2.0-0
     - libxi6
@@ -95,11 +95,10 @@ parts:
     - xdg-utils
     - libqt5webengine5
     - libqt5webenginewidgets5
-#     - ffmpeg
     - libswscale5
     - libavformat58
     - libavcodec58
-    - libavdevice58
+    - libavutil56
     stage:
     - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
     - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
