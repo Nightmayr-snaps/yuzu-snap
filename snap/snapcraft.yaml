@@ -76,7 +76,8 @@ parts:
     - qttools5-dev-tools
     - libavcodec-dev
     - libavcodec-extra
-    - ffmpeg
+    - libswscale-dev
+#     - ffmpeg
     stage-packages:
     - libsdl2-2.0-0
     - libxi6
@@ -94,7 +95,7 @@ parts:
     - xdg-utils
     - libqt5webengine5
     - libqt5webenginewidgets5
-    - ffmpeg
+#     - ffmpeg
     - libswscale5
     - libavformat58
     - libavcodec58
