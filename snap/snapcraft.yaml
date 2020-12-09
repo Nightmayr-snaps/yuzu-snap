@@ -54,7 +54,7 @@ parts:
     - ninja-build
     - build-essential
     - gcc-10
-    - g++10
+    - g++-10
     - python3-pip
     - sqlite3
     - libsqlite3-dev
