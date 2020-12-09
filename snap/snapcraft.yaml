@@ -32,7 +32,6 @@ parts:
     plugin: cmake
     cmake-parameters: 
     - -DCMAKE_BUILD_TYPE=Release
-    - -DYUZU_USE_BUNDLED_UNICORN=ON
     - -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON
     - -DUSE_DISCORD_PRESENCE=ON
     - -DENABLE_QT_TRANSLATION=ON
