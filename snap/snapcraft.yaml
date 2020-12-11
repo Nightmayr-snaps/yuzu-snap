@@ -197,6 +197,8 @@ layout:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
+  /usr/share/libdrm:
+    symlink: $SNAP/usr/share/libdrm
   /usr/share/qt5:
     symlink: $SNAP/usr/share/qt5
 
