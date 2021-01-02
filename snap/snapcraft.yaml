@@ -103,6 +103,7 @@ parts:
     - libavformat58
     - libavcodec58
     - libavutil56
+    - glslang-tools
     stage:
     - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
     - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
