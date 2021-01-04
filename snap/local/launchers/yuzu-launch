@@ -1,0 +1,9 @@
+#!/bin/bash
+
+VENDOR=$(glxinfo | grep "OpenGL vendor")
+
+if [[ $VENDOR == *"NVIDIA"* ]]; then
+    export __GL_THREADED_OPTIMIZATIONS=1
+fi
+
+exec "${@}"
