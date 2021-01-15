@@ -250,9 +250,4 @@ apps:
     - bluez
     - browser-support
     - screen-inhibit-control
-  yuzu-tester:
-    command: usr/local/bin/yuzu-tester
-    environment:
-      HOME: "$SNAP_USER_COMMON"
-      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
 
