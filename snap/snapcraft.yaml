@@ -20,8 +20,8 @@ description: |
   Donate to yuzu: https://yuzu-emu.org/donate
 license: GPL-2.0
 icon: snap/gui/yuzu.png
-grade: stable # must be 'stable' to release into candidate/stable channels
-confinement: strict # use 'strict' once you have the right plugs and slots
+grade: stable
+confinement: strict
 architectures:
   - build-on: amd64
 
@@ -226,6 +226,7 @@ apps:
     - bluez
     - browser-support
     - screen-inhibit-control
+    - raw-usb
   yuzu-cmd:
     command: usr/local/bin/yuzu-cmd
     command-chain:
@@ -250,4 +251,5 @@ apps:
     - bluez
     - browser-support
     - screen-inhibit-control
+    - raw-usb
 
