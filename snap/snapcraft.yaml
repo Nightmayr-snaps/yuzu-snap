@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '0-515'
+version: '0-516'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -81,7 +81,7 @@ parts:
     - libavformat-dev
     - libavutil-dev
     - libswscale-dev
-    - glslang-tools
+    # - glslang-tools
     stage-packages:
     - libsdl2-2.0-0
     - libxi6
@@ -111,6 +111,14 @@ parts:
     after:
     - patches
     - desktop-qt5
+    - glslangvalidator
+  glslangvalidator:
+    plugin: nil
+    source: https://github.com/KhronosGroup/glslang/releases/download/master-tot/glslang-master-linux-Release.zip
+    override-build: |
+      cp -r $SNAPCRAFT_PART_BUILD/* /usr
+    prime:
+    - -*
   desktop-qt5:
     build-packages:
     - build-essential
