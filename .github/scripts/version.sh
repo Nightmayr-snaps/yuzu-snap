@@ -3,7 +3,7 @@
 # check latest tagged version
 LATEST_VERSION_TAG="$(curl https://api.github.com/repos/yuzu-emu/yuzu-mainline/releases/latest -s | jq .tag_name -r)"
 CURRENT_VERSION_SNAP="$(grep version snap/snapcraft.yaml | cut -d ' ' -f2 | tr -d \"\'\")"
-CURRENT_VERSION_TAG_SNAP=mainline-$CURRENT_VERSION_SNAP
+CURRENT_VERSION_TAG_SNAP=mainline-0-$CURRENT_VERSION_SNAP
 LATEST_VERSION=${LATEST_VERSION_TAG#mainline-}
 
 
