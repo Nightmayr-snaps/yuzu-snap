@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '0-595'
+version: '606'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -24,19 +24,24 @@ grade: stable
 confinement: strict
 architectures:
   - build-on: amd64
-
+package-repositories:
+  - type: apt
+    ppa: cybermax-dexter/sdl2-backport
 parts:
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
-    source-tag: mainline-$SNAPCRAFT_PROJECT_VERSION
+    source-tag: mainline-0-$SNAPCRAFT_PROJECT_VERSION
     plugin: cmake
     cmake-parameters: 
     - -DCMAKE_BUILD_TYPE=Release
     - -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON
     - -DUSE_DISCORD_PRESENCE=ON
     - -DENABLE_QT_TRANSLATION=ON
-    - -DYUZU_USE_QT_WEB_ENGINE=ON
-    cmake-generator: Ninja #Can be either Ninja or Unix Makefiles (default).
+    # - -DYUZU_USE_QT_WEB_ENGINE=ON
+    # - -DBoost_USE_STATIC_LIBS=ON
+    - -DYUZU_ENABLE_COMPATIBILITY_REPORTING=${ENABLE_COMPATIBILITY_REPORTING:-"OFF"}
+    - -DDISPLAY_VERSION=$SNAPCRAFT_PROJECT_VERSION
+    cmake-generator: Ninja
     override-pull: |
       snapcraftctl pull
       git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
@@ -58,7 +63,7 @@ parts:
     - python3-pip
     - sqlite3
     - libsqlite3-dev
-    - libsdl2-dev 
+    # - libsdl2-dev
     - python3-setuptools
     - qtbase5-dev 
     - libqt5opengl5-dev 
