@@ -87,6 +87,7 @@ parts:
     - libavutil-dev
     - libswscale-dev
     # - glslang-tools
+    - gsettings-desktop-schemas-dev
     stage-packages:
     - libsdl2-2.0-0
     - libxi6
