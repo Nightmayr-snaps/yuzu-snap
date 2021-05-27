@@ -1,8 +1,8 @@
 name: Build-Snap-Edge
 
 on:
-  pull_request:
-    branches: [ master ]
+  workflow_dispatch:
+
 
 jobs:
   build:
