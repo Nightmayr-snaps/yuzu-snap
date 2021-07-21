@@ -93,6 +93,9 @@ parts:
     - automake
     - autoconf
     - libtool
+    - libpulse-dev
+    - libasound2
+    - libhidapi-dev
     # - glslang-tools
     stage-packages:
     # - libsdl2-2.0-0
@@ -115,6 +118,9 @@ parts:
     - libavformat58
     - libavcodec58
     - libavutil56
+    - libhidapi-libusb0
+    - libhidapi-hidraw0
+    - libasound2
     stage:
     - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
     - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
