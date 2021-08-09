@@ -24,9 +24,11 @@ grade: stable
 confinement: strict
 architectures:
   - build-on: amd64
-package-repositories:
-  - type: apt
-    ppa: cybermax-dexter/sdl2-backport
+# package-repositories:
+  # - type: apt
+  #   ppa: cybermax-dexter/sdl2-backport
+  # - type: apt
+  #   ppa: beineri/opt-qt-5.15.2-focal
 parts:
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
@@ -45,6 +47,8 @@ parts:
     build-environment:
       - TITLEBARFORMATIDLE: "yuzu {}"
       - TITLEBARFORMATRUNNING: "yuzu {} | {}"
+      - LDFLAG: "-L$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET"
+      - LD_LIBRARY_PATH: $SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$LD_LIBRARY_PATH
     cmake-generator: Ninja
     override-pull: |
       snapcraftctl pull
@@ -68,11 +72,13 @@ parts:
     - sqlite3
     - libsqlite3-dev
     - python3-setuptools
-    - qtbase5-dev 
-    - libqt5opengl5-dev 
-    - libqt5svg5
-    - qtwebengine5-dev 
-    - qtbase5-private-dev 
+    # - qtbase5-dev 
+    # - qtwebengine5-dev 
+    # - qtbase5-private-dev 
+    # - libqt5opengl5-dev 
+    # - libqt5svg5
+    # - qttools5-dev
+    # - qttools5-dev-tools
     - libvulkan-dev
     - python
     - libfmt-dev
@@ -83,8 +89,6 @@ parts:
     - libopus-dev
     - zlib1g-dev
     - libzstd-dev
-    - qttools5-dev
-    - qttools5-dev-tools
     - libavcodec-dev
     - libavformat-dev
     - libavutil-dev
@@ -97,6 +101,17 @@ parts:
     - libasound2
     - libhidapi-dev
     # - glslang-tools
+    # - qt515base
+    # - qt515declarative
+    # - qt515xmlpatterns
+    # - qt515wayland
+    # - qt515svg
+    # - qt515tools
+    # - qt515webengine
+    - libudev-dev
+    - libx11-dev
+    - libxext-dev
+    - libgl-dev
     stage-packages:
     # - libsdl2-2.0-0
     - libxi6
@@ -112,8 +127,8 @@ parts:
     - libopus0
     - mesa-utils
     - xdg-utils
-    - libqt5webengine5
-    - libqt5webenginewidgets5
+    # - libqt5webengine5
+    # - libqt5webenginewidgets5
     - libswscale5
     - libavformat58
     - libavcodec58
@@ -126,8 +141,21 @@ parts:
     - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
     - -lib/x86_64-linux-gnu/libz.so.1.2.11
     - -usr/share/doc
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Core.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5DBus.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5EglFSDeviceIntegration.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Gui.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Network.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5PrintSupport.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Svg.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Widgets.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5XcbQpa.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Xml.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5EglFsKmsSupport.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5
     after:
     - patches
+    - qt5
     - desktop-qt5
     - glslangvalidator
   glslangvalidator:
@@ -137,42 +165,212 @@ parts:
       cp -r $SNAPCRAFT_PART_BUILD/* /usr
     prime:
     - -*
+
   desktop-qt5:
-    build-packages:
-    - build-essential
-    - qtbase5-dev
-    - dpkg-dev
-    make-parameters:
-    - FLAVOR=qt5
-    plugin: make
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source: https://github.com/desktop-app/snapcraft-desktop-helpers.git
     source-subdir: qt
+    plugin: make
+    make-parameters: ["FLAVOR=qt5"]
+    build-packages:
+      - build-essential
+      - dpkg-dev
     stage-packages:
-    - libxkbcommon0
-    - ttf-ubuntu-font-family
-    - dmz-cursor-theme
-    - light-themes
-    - adwaita-icon-theme
-    - gnome-themes-standard
-    - shared-mime-info
-    - libqt5gui5
-    - libgtk2.0-0
-    - libgdk-pixbuf2.0-0
-    - libqt5svg5
-    - libgpm2
-    - freeglut3
-    - libslang2
-    - try:
-      - appmenu-qt5
-    - locales-all
-    - qtwayland5
-    - xdg-user-dirs
+      - libxkbcommon0
+      - ttf-ubuntu-font-family
+      - dmz-cursor-theme
+      - light-themes
+      - adwaita-icon-theme
+      - gnome-themes-standard
+      - shared-mime-info
+      - libgdk-pixbuf2.0-0
+      - locales-all
+      - xdg-user-dirs
+      - libgtk2.0-0
     override-prime: |
       snapcraftctl prime
       sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
       sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
     stage:
       - -usr/share/doc
+    after:
+      - qt5
+
+  qt5:
+    plugin: nil
+    build-packages:
+      - libdbus-1-dev
+      - libegl-dev
+      - libfontconfig1-dev
+      - libfreetype-dev
+      - libgl-dev
+      - libglib2.0-dev
+      - libgtk-3-dev
+      - libharfbuzz-dev
+      - libicu-dev
+      - libpcre2-dev
+      - libpng-dev
+      - libssl-dev
+      - libwayland-dev
+      - libx11-dev
+      - libx11-xcb-dev
+      - libxcb1-dev
+      - libxcb-glx0-dev
+      - libxcb-icccm4-dev
+      - libxcb-image0-dev
+      - libxcb-keysyms1-dev
+      - libxcb-randr0-dev
+      - libxcb-render0-dev
+      - libxcb-render-util0-dev
+      - libxcb-shape0-dev
+      - libxcb-shm0-dev
+      - libxcb-sync-dev
+      - libxcb-util-dev
+      - libxcb-xfixes0-dev
+      - libxcb-xinerama0-dev
+      - libxcb-xinput-dev
+      - libxcb-xkb-dev
+      - libxcursor-dev
+      - libxkbcommon-dev
+      - libxkbcommon-x11-dev
+      - zlib1g-dev
+      # webengine deps
+      - libxcomposite-dev
+      - libxdamage-dev
+      - libxrandr-dev
+      - libxtst-dev
+      - libxss-dev
+      - libevent-dev
+      - libcap-dev
+      - libpulse-dev
+      - libudev-dev
+      - libpci-dev
+      - libnss3-dev
+      - libasound2-dev
+      - libegl1-mesa-dev
+      - gperf
+      - bison
+      - nodejs
+      - libdrm-dev
+      - flex
+      - libxcb-dri3-dev
+      # optional webengine deps
+      - libsrtp2-dev
+      - libjsoncpp-dev
+      - libopus-dev
+      - libminizip-dev
+      - libavutil-dev
+      - libavformat-dev
+      - libavcodec-dev
+      - libvpx-dev
+      - libsnappy-dev
+      - libre2-dev
+      - libprotobuf-dev
+      - protobuf-compiler
+    stage-packages:
+      - libdbus-1-3
+      - libegl1
+      - libfontconfig1
+      - libfreetype6
+      - libgl1
+      - libglib2.0-0
+      - libgtk-3-0
+      - libharfbuzz0b
+      - libicu66
+      - libpcre2-16-0
+      - libpng16-16
+      - libssl1.1
+      - libwayland-client0
+      - libwayland-cursor0
+      - libwayland-egl1
+      - libx11-6
+      - libx11-xcb1
+      - libxcb1
+      - libxcb-glx0
+      - libxcb-icccm4
+      - libxcb-image0
+      - libxcb-keysyms1
+      - libxcb-randr0
+      - libxcb-render0
+      - libxcb-render-util0
+      - libxcb-shape0
+      - libxcb-shm0
+      - libxcb-sync1
+      - libxcb-util1
+      - libxcb-xfixes0
+      - libxcb-xinerama0
+      - libxcb-xinput0
+      - libxcb-xkb1
+      - libxcursor1
+      - libxkbcommon0
+      - libxkbcommon-x11-0
+      - zlib1g
+      - libasound2
+      - libevent-2.1-7
+      - libice6
+      - libjpeg-turbo8
+      - libminizip1
+      - libnspr4
+      - libnss3
+      - libopus0
+      - libre2-5
+      - libsm6
+      - libsnappy1v5
+      - libvpx6
+      - libxss1
+    override-pull: |
+      git clone -b v5.15.2 --depth=1 git://code.qt.io/qt/qt5.git .
+      perl init-repository --module-subset=qtbase,qtwayland,qtimageformats,qtsvg,qttools,qtwebengine,qtdeclarative
+      git submodule update qtbase qtwayland qtimageformats qtsvg qtwebengine qttools qtdeclarative
+
+      cd qtbase
+      git apply $SNAPCRAFT_STAGE/qtbase-ordonly.patch
+    override-build: |
+      ./configure \
+        -prefix /usr \
+        -bindir /usr/lib/qt5/bin \
+        -libdir /usr/lib/$SNAPCRAFT_ARCH_TRIPLET \
+        -docdir /usr/share/qt5/doc \
+        -headerdir /usr/include/$SNAPCRAFT_ARCH_TRIPLET/qt5 \
+        -datadir /usr/share/qt5 \
+        -archdatadir /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5 \
+        -plugindir /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/plugins \
+        -importdir /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/imports \
+        -translationdir /usr/share/qt5/translations \
+        -hostdatadir /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5 \
+        -sysconfdir /etc/xdg \
+        -examplesdir /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/examples \
+        -release \
+        -opensource \
+        -confirm-license \
+        -nomake examples \
+        -nomake tests \
+        -I $SNAPCRAFT_STAGE/usr/include \
+        -L $SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET
+
+      make -j$SNAPCRAFT_PARALLEL_BUILD_COUNT
+      echo $?
+      make INSTALL_ROOT="$SNAPCRAFT_PART_INSTALL" install
+      echo $?
+    stage:
+      - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libjpeg.so.8.2.2
+    prime:
+      - -./usr/include
+      - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/cmake
+      - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pkgconfig
+      - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/bin
+      - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/mkspecs
+      - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/examples
+      # Allow tdesktop's custom try-portal-and-fallback logic to work
+      # - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5/plugins/platformthemes/libqxdgdesktopportal.so
+      - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/*.a
+      - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/*.la
+      - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/*.prl
+      - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/*.so
+      - -./usr/lib/qt5
+      - -./usr/share
+    after:
+      - patches
+
   plasma-integration:
     plugin: nil
     stage-packages:
@@ -181,6 +379,21 @@ parts:
     - plasma-integration
     stage:
     - -usr/share/doc
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Core.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5DBus.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5EglFSDeviceIntegration.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Gui.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Network.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5PrintSupport.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Svg.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Widgets.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5XcbQpa.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Xml.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5EglFsKmsSupport.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Qml.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5Quick.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libQt5QuickWidgets.so.5
+    - -./usr/lib/$SNAPCRAFT_ARCH_TRIPLET/qt5
   patches:
     plugin: dump
     source: snap/local/patches
@@ -228,13 +441,13 @@ apps:
   yuzu:
     command: usr/local/bin/yuzu
     command-chain:
+    - "bin/yuzu-launch"
     - "bin/desktop-launch"
     - "bin/vulkan-icd-files"
-    - "bin/yuzu-launch"
     desktop: usr/local/share/applications/yuzu.desktop
     environment:
       HOME: "$SNAP_USER_COMMON"
-      LD_LIBRARY_PATH: "$$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
       PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
