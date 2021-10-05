@@ -97,6 +97,7 @@ parts:
     - qt515tools
     - qt515wayland
     - qt515webengine
+    - libudev-dev
     stage-packages:
     # - libsdl2-2.0-0
     - libxi6
