@@ -27,6 +27,8 @@ architectures:
 package-repositories:
   - type: apt
     ppa: cybermax-dexter/sdl2-backport
+  - type: apt
+    ppa: beineri/opt-qt-5.15.2-focal
 parts:
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
@@ -68,11 +70,6 @@ parts:
     - sqlite3
     - libsqlite3-dev
     - python3-setuptools
-    - qtbase5-dev 
-    - libqt5opengl5-dev 
-    - libqt5svg5
-    - qtwebengine5-dev 
-    - qtbase5-private-dev 
     - libvulkan-dev
     - python
     - libfmt-dev
@@ -83,8 +80,6 @@ parts:
     - libopus-dev
     - zlib1g-dev
     - libzstd-dev
-    - qttools5-dev
-    - qttools5-dev-tools
     - libavcodec-dev
     - libavformat-dev
     - libavutil-dev
@@ -98,6 +93,10 @@ parts:
     - libhidapi-dev
     - mesa-common-dev
     # - glslang-tools
+    - qt515base
+    - qt515tools
+    - qt515wayland
+    - qt515webengine
     stage-packages:
     # - libsdl2-2.0-0
     - libxi6
@@ -113,8 +112,6 @@ parts:
     - libopus0
     - mesa-utils
     - xdg-utils
-    - libqt5webengine5
-    - libqt5webenginewidgets5
     - libswscale5
     - libavformat58
     - libavcodec58
@@ -122,6 +119,10 @@ parts:
     - libhidapi-libusb0
     - libhidapi-hidraw0
     - libasound2
+    - qt515base
+    - qt515tools
+    - qt515wayland
+    - qt515webengine
     stage:
     - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
     - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
@@ -156,17 +157,14 @@ parts:
     - adwaita-icon-theme
     - gnome-themes-standard
     - shared-mime-info
-    - libqt5gui5
     - libgtk2.0-0
     - libgdk-pixbuf2.0-0
-    - libqt5svg5
     - libgpm2
     - freeglut3
     - libslang2
     - try:
       - appmenu-qt5
     - locales-all
-    - qtwayland5
     - xdg-user-dirs
     override-prime: |
       snapcraftctl prime
@@ -237,10 +235,11 @@ apps:
     desktop: usr/local/share/applications/yuzu.desktop
     environment:
       HOME: "$SNAP_USER_COMMON"
+      QT_DIR: $SNAP/opt/qt515
       LD_LIBRARY_PATH: "$$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
-      PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
+      PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5:$SNAP/opt/qt515/bin"
     plugs:
     - desktop
     - desktop-legacy
