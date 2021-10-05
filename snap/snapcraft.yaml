@@ -96,6 +96,7 @@ parts:
     - libpulse-dev
     - libasound2
     - libhidapi-dev
+    - mesa-common-dev
     # - glslang-tools
     stage-packages:
     # - libsdl2-2.0-0
