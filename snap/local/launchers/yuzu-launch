@@ -6,4 +6,6 @@ if [[ $VENDOR == *"NVIDIA"* ]]; then
     export __GL_THREADED_OPTIMIZATIONS=1
 fi
 
+export QT_PLUGIN_PATH=$QT_PLUGIN_PATH:$SNAP/usr/lib/$SNAP_LAUNCHER_ARCH_TRIPLET/plugins
+
 exec "${@}"
