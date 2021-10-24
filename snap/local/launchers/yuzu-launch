@@ -6,4 +6,6 @@ if [[ $VENDOR == *"NVIDIA"* ]]; then
     export __GL_THREADED_OPTIMIZATIONS=1
 fi
 
+export QTWEBENGINEPROCESS_PATH=$SNAP/opt/qt515/libexec/QtWebEngineProcess
+
 exec "${@}"
