@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '745'
+version: '791'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -39,7 +39,7 @@ parts:
     - -DDISPLAY_VERSION=$SNAPCRAFT_PROJECT_VERSION
     - -DBUILD_TAG=mainline-$SNAPCRAFT_PROJECT_VERSION"
     - -DBUILD_REPOSITORY=yuzu-emu/yuzu-mainline"
-    # - "-DCMAKE_FIND_ROOT_PATH=/usr\\;/root/stage\\;/snap/kde-frameworks-5-qt-5-15-3-core20-sdk/current"
+    - "-DCMAKE_FIND_ROOT_PATH=/usr\\;/root/stage\\;/snap/kde-frameworks-5-qt-5-15-3-core20-sdk/current"
     build-environment:
       - TITLEBARFORMATIDLE: "yuzu {}"
       - TITLEBARFORMATRUNNING: "yuzu {} | {}"
@@ -58,10 +58,7 @@ parts:
       snapcraftctl build
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/yuzu.desktop
     build-snaps:
-      - kde-frameworks-5-qt-5-15-3-core20-sdk/latest/candidate
-      - kde-frameworks-5-qt-5-15-3-core20/latest/candidate
-      # - nightmayr-kf5-qt-5-15-2-core20-sdk/latest/stable
-      # - nightmayr-kf5-qt-5-15-2-core20/latest/stable
+      - kde-frameworks-5-qt-5-15-3-core20-sdk
     build-packages:
     - cmake
     - ninja-build
@@ -93,12 +90,11 @@ parts:
     - libpulse-dev
     - libasound2
     - libhidapi-dev
-    - libudev-dev
-    - nasm
-    - libx11-dev
-    - libgl-dev
-    - pkg-config
+    - mesa-common-dev
+    - libxext-dev
+    # - qttools5-dev
     # - glslang-tools
+    - libudev-dev
     stage-packages:
     # - libsdl2-2.0-0
     - libxi6
@@ -120,6 +116,7 @@ parts:
     - libhidapi-libusb0
     - libhidapi-hidraw0
     - libasound2
+    - libudev1
     stage:
     - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
     - -usr/share/doc/libdbus-1-3/changelog.Debian.gz
@@ -127,7 +124,6 @@ parts:
     - -usr/share/doc
     after:
     - patches
-    # - kde-neon-extension
     - glslangvalidator
   glslangvalidator:
     plugin: nil
@@ -154,37 +150,6 @@ parts:
       - libglib2.0-0
     stage:
     - -usr/share/doc
-  # kde-neon-extension:
-  #   build-packages:
-  #   - g++
-  #   build-snaps:
-  #   - kde-frameworks-5-qt-5-15-3-core20-sdk/latest/candidate
-  #   make-parameters:
-  #   - PLATFORM_PLUG=kde-frameworks-5-plug
-  #   plugin: make
-  #   source: $SNAPCRAFT_EXTENSIONS_DIR/desktop
-  #   source-subdir: kde-neon
-
-# plugs:
-#   gtk-3-themes:
-#     interface: content
-#     target: $SNAP/data-dir/themes
-#     default-provider: gtk-common-themes
-#   icon-themes:
-#     interface: content
-#     target: $SNAP/data-dir/icons
-#     default-provider: gtk-common-themes
-#   sound-themes:
-#     interface: content
-#     target: $SNAP/data-dir/sounds
-#     default-provider: gtk-common-themes
-  # desktop:
-  #   mount-host-font-cache: false
-  # kde-frameworks-5-plug:
-  #   content: nightmayr-qt-5-15-2-core20-all
-  #   default-provider: nightmayr-kf5-qt-5-15-2-core20
-  #   interface: content
-  #   target: $SNAP/kf5
 
 layout:
   /usr/share/vulkan:
@@ -260,13 +225,3 @@ apps:
     - screen-inhibit-control
     - raw-usb
 
-# assumes:
-# - snapd2.43
-# environment:
-#   SNAP_DESKTOP_RUNTIME: $SNAP/kf5
-# hooks:
-#   configure:
-#     command-chain:
-#     - snap/command-chain/hooks-configure-desktop
-#     plugs:
-#     - desktop
