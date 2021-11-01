@@ -233,7 +233,6 @@ apps:
     command: usr/local/bin/yuzu
     command-chain:
     - "bin/desktop-launch"
-    - "bin/vulkan-icd-files"
     - "bin/yuzu-launch"
     desktop: usr/local/share/applications/yuzu.desktop
     environment:
@@ -266,7 +265,6 @@ apps:
   yuzu-cmd:
     command: usr/local/bin/yuzu-cmd
     command-chain:
-    - "bin/vulkan-icd-files"
     - "bin/yuzu-launch"
     environment:
       HOME: "$SNAP_USER_COMMON"
