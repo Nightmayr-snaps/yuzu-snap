@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '794'
+version: '795'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
