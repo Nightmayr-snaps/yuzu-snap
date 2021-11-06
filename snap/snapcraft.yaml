@@ -23,13 +23,13 @@ icon: snap/gui/yuzu.png
 grade: stable
 confinement: strict
 architectures:
-  - build-on: amd64
+- build-on: amd64
 parts:
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
     source-tag: mainline-0-$SNAPCRAFT_PROJECT_VERSION
     plugin: cmake
-    cmake-parameters: 
+    cmake-parameters:
     - -DCMAKE_BUILD_TYPE=Release
     - -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON
     - -DUSE_DISCORD_PRESENCE=ON
@@ -39,11 +39,12 @@ parts:
     - -DDISPLAY_VERSION=$SNAPCRAFT_PROJECT_VERSION
     - -DBUILD_TAG=mainline-$SNAPCRAFT_PROJECT_VERSION"
     - -DBUILD_REPOSITORY=yuzu-emu/yuzu-mainline"
-    - "-DCMAKE_FIND_ROOT_PATH=/usr\\;/root/stage\\;/snap/kde-frameworks-5-qt-5-15-3-core20-sdk/current"
+    - -DCMAKE_FIND_ROOT_PATH=/usr\;/root/stage\;/snap/kde-frameworks-5-qt-5-15-3-core20-sdk/current
     build-environment:
-      - TITLEBARFORMATIDLE: "yuzu {}"
-      - TITLEBARFORMATRUNNING: "yuzu {} | {}"
-      # - SNAPCRAFT_CMAKE_ARGS: -DCMAKE_FIND_ROOT_PATH=/snap/kde-frameworks-5-qt-5-15-3-core20-sdk/current
+    - &id001
+      SNAPCRAFT_CMAKE_ARGS: -DCMAKE_FIND_ROOT_PATH=/snap/kde-frameworks-5-qt-5-15-3-core20-sdk/current
+    - TITLEBARFORMATIDLE: yuzu {}
+    - TITLEBARFORMATRUNNING: yuzu {} | {}
     cmake-generator: Ninja
     override-pull: |
       snapcraftctl pull
@@ -58,7 +59,7 @@ parts:
       snapcraftctl build
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/yuzu.desktop
     build-snaps:
-      - kde-frameworks-5-qt-5-15-3-core20-sdk
+    - kde-frameworks-5-qt-5-15-3-core20-sdk
     build-packages:
     - cmake
     - ninja-build
@@ -73,7 +74,7 @@ parts:
     - python
     - libfmt-dev
     - libzip-dev
-    - liblz4-dev 
+    - liblz4-dev
     - libmbedtls-dev
     - libssl-dev
     - libopus-dev
@@ -92,11 +93,8 @@ parts:
     - libhidapi-dev
     - mesa-common-dev
     - libxext-dev
-    # - qttools5-dev
-    # - glslang-tools
     - libudev-dev
     stage-packages:
-    # - libsdl2-2.0-0
     - libxi6
     - libxinerama1
     - libxrandr2
@@ -128,29 +126,42 @@ parts:
   glslangvalidator:
     plugin: nil
     source: https://github.com/KhronosGroup/glslang/releases/download/master-tot/glslang-master-linux-Release.zip
-    override-build: |
-      cp -r $SNAPCRAFT_PART_BUILD/* /usr
+    override-build: 'cp -r $SNAPCRAFT_PART_BUILD/* /usr'
     prime:
     - -*
+    build-environment: &id002
+    - *id001
   patches:
     plugin: dump
     source: snap/local/patches
     source-type: local
     prime:
-      - -*
+    - -*
+    build-environment: *id002
   launchers:
     plugin: dump
     source: snap/local/launchers
     source-type: local
     organize:
       '*': bin/
+    build-environment: *id002
   glib2:
     plugin: nil
     stage-packages:
-      - libglib2.0-0
+    - libglib2.0-0
     stage:
     - -usr/share/doc
-
+    build-environment: *id002
+  kde-neon-extension:
+    build-packages:
+    - g++
+    build-snaps:
+    - kde-frameworks-5-qt-5-15-3-core20-sdk/latest/candidate
+    make-parameters:
+    - PLATFORM_PLUG=nightmayr-kde-frameworks-5-plug
+    plugin: make
+    source: $SNAPCRAFT_EXTENSIONS_DIR/desktop
+    source-subdir: kde-neon
 layout:
   /usr/share/vulkan:
     symlink: $SNAP/usr/share/vulkan
@@ -162,30 +173,27 @@ layout:
     symlink: $SNAP/data-dir/kf5/usr/share/qt5
   /usr/share/libdrm:
     symlink: $SNAP/data-dir/kf5/usr/share/libdrm
-
 apps:
   yuzu:
     command: usr/local/bin/yuzu
     command-chain:
-    # - "bin/desktop-launch"
-    - "bin/vulkan-icd-files"
-    - "bin/yuzu-launch"
-    extensions:
-      - kde-neon
+    - snap/command-chain/desktop-launch
+    - bin/vulkan-icd-files
+    - bin/yuzu-launch
     desktop: usr/local/share/applications/yuzu.desktop
     environment:
-      HOME: "$SNAP_USER_COMMON"
-      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      HOME: $SNAP_USER_COMMON
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
       KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
-      PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
+      PATH: $PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5
     plugs:
     - desktop
     - desktop-legacy
-    - x11
-    - wayland
-    - audio-playback
     - opengl
+    - wayland
+    - x11
+    - audio-playback
     - joystick
     - unity7
     - network
@@ -202,12 +210,12 @@ apps:
   yuzu-cmd:
     command: usr/local/bin/yuzu-cmd
     command-chain:
-    - "bin/vulkan-icd-files"
-    - "bin/yuzu-launch"
+    - bin/vulkan-icd-files
+    - bin/yuzu-launch
     environment:
-      HOME: "$SNAP_USER_COMMON"
-      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
-      DISABLE_WAYLAND: 1 
+      HOME: $SNAP_USER_COMMON
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
+      DISABLE_WAYLAND: 1
     plugs:
     - x11
     - wayland
@@ -224,4 +232,29 @@ apps:
     - browser-support
     - screen-inhibit-control
     - raw-usb
-
+assumes:
+- snapd2.43
+plugs:
+  desktop:
+    mount-host-font-cache: false
+  icon-themes:
+    default-provider: gtk-common-themes
+    interface: content
+    target: $SNAP/data-dir/icons
+  nightmayr-kde-frameworks-5-plug:
+    content: nightmayr-kf5-qt-5-15-2-core20-all
+    default-provider: nightmayr-kf5-qt-5-15-2-core20
+    interface: content
+    target: $SNAP/kf5
+  sound-themes:
+    default-provider: gtk-common-themes
+    interface: content
+    target: $SNAP/data-dir/sounds
+environment:
+  SNAP_DESKTOP_RUNTIME: $SNAP/kf5
+hooks:
+  configure:
+    command-chain:
+    - snap/command-chain/hooks-configure-desktop
+    plugs:
+    - desktop
