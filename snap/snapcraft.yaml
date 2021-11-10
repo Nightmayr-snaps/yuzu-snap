@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '791'
+version: '804'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -162,6 +162,21 @@ parts:
     plugin: make
     source: $SNAPCRAFT_EXTENSIONS_DIR/desktop
     source-subdir: kde-neon
+  cleanup:
+    after:
+    - kde-neon-extension
+    - yuzu
+    - launchers
+    - glib2
+    plugin: nil
+    build-snaps:
+    - core20
+    - nightmayr-kf5-qt-5-15-2-core20
+    override-prime: |
+      set -eux
+      for snap in "core20" "nightmayr-kf5-qt-5-15-2-core20"; do  # List all content-snaps and base snaps you're using here
+        cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
+      done
 layout:
   /usr/share/vulkan:
     symlink: $SNAP/usr/share/vulkan
