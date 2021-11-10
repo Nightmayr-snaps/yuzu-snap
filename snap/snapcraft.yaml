@@ -145,13 +145,6 @@ parts:
     organize:
       '*': bin/
     build-environment: *id002
-  glib2:
-    plugin: nil
-    stage-packages:
-    - libglib2.0-0
-    stage:
-    - -usr/share/doc
-    build-environment: *id002
   kde-neon-extension:
     build-packages:
     - g++
@@ -167,7 +160,6 @@ parts:
     - kde-neon-extension
     - yuzu
     - launchers
-    - glib2
     plugin: nil
     build-snaps:
     - core20
@@ -193,7 +185,6 @@ apps:
     command: usr/local/bin/yuzu
     command-chain:
     - snap/command-chain/desktop-launch
-    - bin/vulkan-icd-files
     - bin/yuzu-launch
     desktop: usr/local/share/applications/yuzu.desktop
     environment:
@@ -225,8 +216,7 @@ apps:
   yuzu-cmd:
     command: usr/local/bin/yuzu-cmd
     command-chain:
-    - bin/vulkan-icd-files
-    - bin/yuzu-launch
+    - "bin/yuzu-launch"
     environment:
       HOME: $SNAP_USER_COMMON
       LD_LIBRARY_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
