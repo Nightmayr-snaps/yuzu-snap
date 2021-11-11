@@ -33,4 +33,10 @@ esac
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH#$SNAP_LIBRARY_PATH:}"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${SNAP_LIBRARY_PATH}"
 
+# Add additional path for KDEPlasmaPlatformTheme.so, until I can figure out how to move this to be with the other Qt plugins
+export QT_PLUGIN_PATH=$QT_PLUGIN_PATH:$SNAP/kf5/usr/lib/$SNAP_LAUNCHER_ARCH_TRIPLET/plugins
+
+# Add KF5 libexec directory containing kioslave5 for KDE file picker when not using portals
+export PATH=$PATH:$KF5_LIBEXEC_DIR
+
 exec "${@}"
