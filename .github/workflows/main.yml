@@ -31,10 +31,10 @@ jobs:
         sed -i "s/version: '${{ env.CURRENT_VERSION }}'/version: '${{ env.LATEST_VERSION }}'/g" snap/snapcraft.yaml
     - uses: snapcore/action-build@v1.0.9
       id: snapcraft
-    - name: Testing snap
-      run: |
-        sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
-        snap run yuzu.yuzu-cmd --version
+#     - name: Testing snap
+#       run: |
+#         sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+#         snap run yuzu.yuzu-cmd --version
     - uses: snapcore/action-publish@v1
       with:
         store_login: ${{ secrets.STORE_LOGIN }}
