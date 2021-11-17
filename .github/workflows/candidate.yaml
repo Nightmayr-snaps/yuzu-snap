@@ -1,0 +1,48 @@
+name: Candidate
+
+on:
+  schedule:
+    - cron: '0 */5 * * *'
+    - cron: '15 13 * * *'
+  push:
+    branches: [ candidate ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[ci-skip]')"
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.PAT }}
+    - name: Check latest version
+      run: |
+        ./.github/scripts/version.sh
+        echo "BUILD=$(cat build)" >> $GITHUB_ENV
+        echo "LATEST_VERSION=$(cat latest)" >> $GITHUB_ENV
+        echo "CURRENT_VERSION=$(cat current)" >> $GITHUB_ENV
+      id: version-check
+    - name: Already latest version - cancelling
+      if: env.BUILD == 'false'
+      uses: andymckay/cancel-action@0.2
+    - name: Update snapcraft.yaml version
+      run: | 
+        sed -i "s/version: '${{ env.CURRENT_VERSION }}'/version: '${{ env.LATEST_VERSION }}'/g" snap/snapcraft.yaml
+    - uses: snapcore/action-build@v1.0.9
+      id: snapcraft
+#     - name: Testing snap
+#       run: |
+#         sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+#         snap run yuzu.yuzu-cmd --version
+    - uses: snapcore/action-publish@v1
+      with:
+        store_login: ${{ secrets.STORE_LOGIN }}
+        snap: ${{ steps.snapcraft.outputs.snap }}
+        release: candidate
+    - name: Committing updated snapcraft.yaml
+      run: |
+        git config --global user.name 'Nightmayr'
+        git config --global user.email 'umayr23@gmail.com'
+        git commit -am "Updating version [ci-skip]"
+        git push origin candidate
