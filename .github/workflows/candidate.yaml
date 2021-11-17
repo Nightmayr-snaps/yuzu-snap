@@ -15,6 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
+        ref: candidate
         token: ${{ secrets.PAT }}
     - name: Check latest version
       run: |
