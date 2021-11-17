@@ -6,8 +6,6 @@ if [[ $VENDOR == *"NVIDIA"* ]]; then
     export __GL_THREADED_OPTIMIZATIONS=1
 fi
 
-export QTWEBENGINEPROCESS_PATH=$SNAP/opt/qt515/libexec/QtWebEngineProcess
-
 #Path to Vulkan ICD files depending on CPU architecture
 case $SNAP_ARCH in
   amd64)
@@ -38,5 +36,12 @@ export QT_PLUGIN_PATH=$QT_PLUGIN_PATH:$SNAP/kf5/usr/lib/$SNAP_LAUNCHER_ARCH_TRIP
 
 # Add KF5 libexec directory containing kioslave5 for KDE file picker when not using portals
 export PATH=$PATH:$KF5_LIBEXEC_DIR
+
+# Use portals on GTK desktops but not on KDE because it seems to be buggy: https://forum.snapcraft.io/t/qt-snap-cant-select-a-folder-via-portal-file-picker-on-kde-but-can-on-gnome/27176/3
+unset QT_QPA_PLATFORMTHEME #this won't be needed on snapcraft v6
+export QT_QPA_PLATFORMTHEME="appmenu-qt5"
+if [ $XDG_CURRENT_DESKTOP == "KDE" ]; then
+  export QT_QPA_PLATFORMTHEME="kde"
+fi
 
 exec "${@}"

@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '805'
+version: '813'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -16,14 +16,17 @@ description: |
 
   Upstream Project: https://yuzu-emu.org/
   snapcraft.yaml Build Definition: https://github.com/Nightmayr/yuzu-snap/blob/master/snap/snapcraft.yaml
-
-  Donate to yuzu: https://yuzu-emu.org/donate
+# issues, donation and website require manual review skip for now
+# issues: https://github.com/Nightmayr-snaps/yuzu-snap/issues
+# donation: https://yuzu-emu.org/donate
+# website: https://yuzu-emu.org/
 license: GPL-2.0
 icon: snap/gui/yuzu.png
 grade: stable
 confinement: strict
 architectures:
 - build-on: amd64
+compression: lzo
 parts:
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
@@ -151,10 +154,14 @@ parts:
     build-snaps:
     - kde-frameworks-5-qt-5-15-3-core20-sdk/latest/candidate
     make-parameters:
-    - PLATFORM_PLUG=nightmayr-kde-frameworks-5-plug
+    - PLATFORM_PLUG=nightmayr-kf5-qt-5-15-2-core20
     plugin: make
     source: $SNAPCRAFT_EXTENSIONS_DIR/desktop
     source-subdir: kde-neon
+    override-prime: |
+      snapcraftctl prime
+      sed -i 's|XDG_DATA_HOME="$SNAP_USER_DATA|XDG_DATA_HOME="$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/snap/command-chain/desktop-launch
+      sed -i 's|XDG_CONFIG_HOME="$SNAP_USER_DATA|XDG_CONFIG_HOME="$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/snap/command-chain/desktop-launch
   cleanup:
     after:
     - kde-neon-extension
@@ -244,8 +251,7 @@ plugs:
     default-provider: gtk-common-themes
     interface: content
     target: $SNAP/data-dir/icons
-  nightmayr-kde-frameworks-5-plug:
-    content: nightmayr-kf5-qt-5-15-2-core20-all
+  nightmayr-kf5-qt-5-15-2-core20:
     default-provider: nightmayr-kf5-qt-5-15-2-core20
     interface: content
     target: $SNAP/kf5
