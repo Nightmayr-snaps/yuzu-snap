@@ -1,11 +1,11 @@
-name: Build-Snap
+name: Candidate
 
 on:
   schedule:
     - cron: '0 */5 * * *'
     - cron: '15 13 * * *'
   push:
-    branches: [ master ]
+    branches: [ candidate ]
   workflow_dispatch:
 
 jobs:
@@ -39,10 +39,10 @@ jobs:
       with:
         store_login: ${{ secrets.STORE_LOGIN }}
         snap: ${{ steps.snapcraft.outputs.snap }}
-        release: stable
+        release: candidate
     - name: Committing updated snapcraft.yaml
       run: |
         git config --global user.name 'Nightmayr'
         git config --global user.email 'umayr23@gmail.com'
         git commit -am "Updating version [ci-skip]"
-        git push origin master
+        git push origin candidate
