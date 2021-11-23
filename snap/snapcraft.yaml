@@ -16,23 +16,23 @@ description: |
 
   Upstream Project: https://yuzu-emu.org/
   snapcraft.yaml Build Definition: https://github.com/Nightmayr/yuzu-snap/blob/master/snap/snapcraft.yaml
-
-  Donate to yuzu: https://yuzu-emu.org/donate
+# issues, donation and website require manual review skip for now
+# issues: https://github.com/Nightmayr-snaps/yuzu-snap/issues
+# donation: https://yuzu-emu.org/donate
+# website: https://yuzu-emu.org/
 license: GPL-2.0
 icon: snap/gui/yuzu.png
 grade: stable
 confinement: strict
 architectures:
-  - build-on: amd64
-package-repositories:
-  - type: apt
-    ppa: beineri/opt-qt-5.15.2-focal
+- build-on: amd64
+compression: lzo
 parts:
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
     source-tag: mainline-0-$SNAPCRAFT_PROJECT_VERSION
     plugin: cmake
-    cmake-parameters: 
+    cmake-parameters:
     - -DCMAKE_BUILD_TYPE=Release
     - -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON
     - -DUSE_DISCORD_PRESENCE=ON
@@ -42,9 +42,12 @@ parts:
     - -DDISPLAY_VERSION=$SNAPCRAFT_PROJECT_VERSION
     - -DBUILD_TAG=mainline-$SNAPCRAFT_PROJECT_VERSION"
     - -DBUILD_REPOSITORY=yuzu-emu/yuzu-mainline"
+    - -DCMAKE_FIND_ROOT_PATH=/usr\;/root/stage\;/snap/kde-frameworks-5-qt-5-15-3-core20-sdk/current
     build-environment:
-      - TITLEBARFORMATIDLE: "yuzu {}"
-      - TITLEBARFORMATRUNNING: "yuzu {} | {}"
+    - &id001
+      SNAPCRAFT_CMAKE_ARGS: -DCMAKE_FIND_ROOT_PATH=/snap/kde-frameworks-5-qt-5-15-3-core20-sdk/current
+    - TITLEBARFORMATIDLE: yuzu {}
+    - TITLEBARFORMATRUNNING: yuzu {} | {}
     cmake-generator: Ninja
     override-pull: |
       snapcraftctl pull
@@ -58,6 +61,8 @@ parts:
       pip3 install conan
       snapcraftctl build
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/yuzu.desktop
+    build-snaps:
+    - kde-frameworks-5-qt-5-15-3-core20-sdk
     build-packages:
     - cmake
     - ninja-build
@@ -72,7 +77,7 @@ parts:
     - python
     - libfmt-dev
     - libzip-dev
-    - liblz4-dev 
+    - liblz4-dev
     - libmbedtls-dev
     - libssl-dev
     - libopus-dev
@@ -90,18 +95,12 @@ parts:
     - libasound2
     - libhidapi-dev
     - mesa-common-dev
-    # - glslang-tools
-    - qt515base
-    - qt515tools
-    - qt515wayland
-    - qt515webengine
+    - libxext-dev
     - libudev-dev
     stage-packages:
-    # - libsdl2-2.0-0
     - libxi6
     - libxinerama1
     - libxrandr2
-    # - qt5-gtk-platformtheme
     - libvulkan1
     - mesa-vulkan-drivers
     - vulkan-utils
@@ -118,11 +117,6 @@ parts:
     - libhidapi-libusb0
     - libhidapi-hidraw0
     - libasound2
-    - qt515base
-    - qt515tools
-    - qt515wayland
-    - qt515webengine
-    - libdouble-conversion3
     - libudev1
     stage:
     - -lib/x86_64-linux-gnu/libdbus-1.so.3.19.11
@@ -131,91 +125,57 @@ parts:
     - -usr/share/doc
     after:
     - patches
-    - desktop-qt5
     - glslangvalidator
   glslangvalidator:
     plugin: nil
     source: https://github.com/KhronosGroup/glslang/releases/download/master-tot/glslang-master-linux-Release.zip
-    override-build: |
-      cp -r $SNAPCRAFT_PART_BUILD/* /usr
+    override-build: 'cp -r $SNAPCRAFT_PART_BUILD/* /usr'
     prime:
     - -*
-  desktop-qt5:
-    build-packages:
-    - build-essential
-    - qtbase5-dev
-    - dpkg-dev
-    make-parameters:
-    - FLAVOR=qt5
-    plugin: make
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: qt
-    stage-packages:
-    - libxkbcommon0
-    - ttf-ubuntu-font-family
-    - dmz-cursor-theme
-    - light-themes
-    - adwaita-icon-theme
-    - gnome-themes-standard
-    - shared-mime-info
-    - libgtk2.0-0
-    - libgdk-pixbuf2.0-0
-    - libgpm2
-    - freeglut3
-    - libslang2
-    - try:
-      - appmenu-qt5
-    - locales-all
-    - xdg-user-dirs
-    override-prime: |
-      snapcraftctl prime
-      sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-      sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
-    stage:
-      - -usr/share/doc
-  # Avoid priming plasma-integration from ubuntu repos as this will pull in older Qt version conflicting with the version from the PPA
-  # TODO: look into how this can be included without causing a mix of two Qt versions (compile from source? include from ubuntu repo but try and manually exclude all Qt libs from focal)
-  # plasma-integration:
-  #   plugin: nil
-  #   stage-packages:
-  #   - breeze-icon-theme
-  #   - kde-style-breeze
-  #   - plasma-integration
-  #   stage:
-  #   - -usr/share/doc
+    build-environment: &id002
+    - *id001
   patches:
     plugin: dump
     source: snap/local/patches
     source-type: local
     prime:
-      - -*
+    - -*
+    build-environment: *id002
   launchers:
     plugin: dump
     source: snap/local/launchers
     source-type: local
     organize:
       '*': bin/
-  glib2:
+    build-environment: *id002
+  kde-neon-extension:
+    build-packages:
+    - g++
+    build-snaps:
+    - kde-frameworks-5-qt-5-15-3-core20-sdk/latest/candidate
+    make-parameters:
+    - PLATFORM_PLUG=nightmayr-kf5-qt-5-15-2-core20
+    plugin: make
+    source: $SNAPCRAFT_EXTENSIONS_DIR/desktop
+    source-subdir: kde-neon
+    override-prime: |
+      snapcraftctl prime
+      sed -i 's|XDG_DATA_HOME="$SNAP_USER_DATA|XDG_DATA_HOME="$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/snap/command-chain/desktop-launch
+      sed -i 's|XDG_CONFIG_HOME="$SNAP_USER_DATA|XDG_CONFIG_HOME="$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/snap/command-chain/desktop-launch
+  cleanup:
+    after:
+    - kde-neon-extension
+    - yuzu
+    - launchers
     plugin: nil
-    stage-packages:
-      - libglib2.0-0
-    stage:
-    - -usr/share/doc
-
-plugs:
-  gtk-3-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
-  icon-themes:
-    interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
-  sound-themes:
-    interface: content
-    target: $SNAP/data-dir/sounds
-    default-provider: gtk-common-themes
-
+    build-snaps:
+    - core20
+    - nightmayr-kf5-qt-5-15-2-core20
+    override-prime: |
+      set -eux
+      for snap in "core20" "nightmayr-kf5-qt-5-15-2-core20"; do  # List all content-snaps and base snaps you're using here
+        cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
+      done
 layout:
   /usr/share/vulkan:
     symlink: $SNAP/usr/share/vulkan
@@ -224,31 +184,27 @@ layout:
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
   /usr/share/qt5:
-    symlink: $SNAP/usr/share/qt5
+    symlink: $SNAP/data-dir/kf5/usr/share/qt5
   /usr/share/libdrm:
-    symlink: $SNAP/usr/share/libdrm
-
+    symlink: $SNAP/data-dir/kf5/usr/share/libdrm
 apps:
   yuzu:
     command: usr/local/bin/yuzu
     command-chain:
-    - "bin/desktop-launch"
-    - "bin/yuzu-launch"
+    - snap/command-chain/desktop-launch
+    - bin/yuzu-launch
     desktop: usr/local/share/applications/yuzu.desktop
     environment:
-      HOME: "$SNAP_USER_COMMON"
-      QT_DIR: $SNAP/opt/qt515
-      LD_LIBRARY_PATH: "$SNAP/opt/qt515/lib:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
-      KDE_FORK_SLAVES: 1
+      HOME: $SNAP_USER_COMMON
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
       DISABLE_WAYLAND: 1
-      PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5:$SNAP/opt/qt515/bin"
     plugs:
     - desktop
     - desktop-legacy
-    - x11
-    - wayland
-    - audio-playback
     - opengl
+    - wayland
+    - x11
+    - audio-playback
     - joystick
     - unity7
     - network
@@ -267,9 +223,9 @@ apps:
     command-chain:
     - "bin/yuzu-launch"
     environment:
-      HOME: "$SNAP_USER_COMMON"
-      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
-      DISABLE_WAYLAND: 1 
+      HOME: $SNAP_USER_COMMON
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
+      DISABLE_WAYLAND: 1
     plugs:
     - x11
     - wayland
@@ -286,4 +242,28 @@ apps:
     - browser-support
     - screen-inhibit-control
     - raw-usb
-
+assumes:
+- snapd2.43
+plugs:
+  desktop:
+    mount-host-font-cache: false
+  icon-themes:
+    default-provider: gtk-common-themes
+    interface: content
+    target: $SNAP/data-dir/icons
+  nightmayr-kf5-qt-5-15-2-core20:
+    default-provider: nightmayr-kf5-qt-5-15-2-core20
+    interface: content
+    target: $SNAP/kf5
+  sound-themes:
+    default-provider: gtk-common-themes
+    interface: content
+    target: $SNAP/data-dir/sounds
+environment:
+  SNAP_DESKTOP_RUNTIME: $SNAP/kf5
+hooks:
+  configure:
+    command-chain:
+    - snap/command-chain/hooks-configure-desktop
+    plugs:
+    - desktop
