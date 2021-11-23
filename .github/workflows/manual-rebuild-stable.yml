@@ -14,10 +14,10 @@ jobs:
 #       with:
 #        snapcraft-args: --enable-experimental-package-repositories
       id: snapcraft
-    - name: Testing snap
-      run: |
-        sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
-        snap run yuzu.yuzu-cmd --version
+#     - name: Testing snap
+#       run: |
+#         sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+#         snap run yuzu.yuzu-cmd --version
     - uses: snapcore/action-publish@v1
       with:
         store_login: ${{ secrets.STORE_LOGIN }}
