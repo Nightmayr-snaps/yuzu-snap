@@ -2,7 +2,7 @@ name: Build-Snap-PR
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ master, candidate ]
 
 jobs:
   build:
