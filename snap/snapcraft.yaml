@@ -184,9 +184,9 @@ layout:
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so:
     symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
   /usr/share/qt5:
-    symlink: $SNAP/data-dir/kf5/usr/share/qt5
+    symlink: $SNAP/kf5/usr/share/qt5
   /usr/share/libdrm:
-    symlink: $SNAP/data-dir/kf5/usr/share/libdrm
+    symlink: $SNAP/kf5/usr/share/libdrm
 apps:
   yuzu:
     command: usr/local/bin/yuzu
