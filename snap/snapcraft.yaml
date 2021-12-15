@@ -27,6 +27,9 @@ confinement: strict
 architectures:
 - build-on: amd64
 compression: lzo
+# package-repositories:
+#   - type: apt
+#     ppa: beineri/opt-qt-5.15.2-focal
 parts:
   yuzu:
     source: https://github.com/yuzu-emu/yuzu-mainline.git
@@ -42,10 +45,10 @@ parts:
     - -DDISPLAY_VERSION=$SNAPCRAFT_PROJECT_VERSION
     - -DBUILD_TAG=mainline-$SNAPCRAFT_PROJECT_VERSION"
     - -DBUILD_REPOSITORY=yuzu-emu/yuzu-mainline"
-    - -DCMAKE_FIND_ROOT_PATH=/usr\;/root/stage\;/snap/kde-frameworks-5-qt-5-15-3-core20-sdk/current
+    - -DCMAKE_FIND_ROOT_PATH=/usr\;/root/stage\;/snap/nightmayr-kf5-qt-5-15-2-core20-sdk/current
     build-environment:
     - &id001
-      SNAPCRAFT_CMAKE_ARGS: -DCMAKE_FIND_ROOT_PATH=/snap/kde-frameworks-5-qt-5-15-3-core20-sdk/current
+      SNAPCRAFT_CMAKE_ARGS: -DCMAKE_FIND_ROOT_PATH=/snap/nightmayr-kf5-qt-5-15-2-core20-sdk/current
     - TITLEBARFORMATIDLE: yuzu {}
     - TITLEBARFORMATRUNNING: yuzu {} | {}
     cmake-generator: Ninja
@@ -62,7 +65,7 @@ parts:
       snapcraftctl build
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/yuzu.desktop
     build-snaps:
-    - kde-frameworks-5-qt-5-15-3-core20-sdk
+    - nightmayr-kf5-qt-5-15-2-core20-sdk
     build-packages:
     - cmake
     - ninja-build
