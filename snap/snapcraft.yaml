@@ -54,7 +54,7 @@ parts:
     cmake-generator: Ninja
     override-pull: |
       snapcraftctl pull
-      git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
+      # git apply $SNAPCRAFT_STAGE/nodirtyversion.patch
     override-build: |
       if [ ! -f /usr/bin/lsb_release ]; then
         apt install -y lsb-release
