@@ -86,10 +86,10 @@ parts:
     - libopus-dev
     - zlib1g-dev
     - libzstd-dev
-    - libavcodec-dev
-    - libavformat-dev
-    - libavutil-dev
-    - libswscale-dev
+    # - libavcodec-dev
+    # - libavformat-dev
+    # - libavutil-dev
+    # - libswscale-dev
     - autotools-dev
     - automake
     - autoconf
@@ -113,10 +113,10 @@ parts:
     - libopus0
     - mesa-utils
     - xdg-utils
-    - libswscale5
-    - libavformat58
-    - libavcodec58
-    - libavutil56
+    # - libswscale5
+    # - libavformat58
+    # - libavcodec58
+    # - libavutil56
     - libhidapi-libusb0
     - libhidapi-hidraw0
     - libasound2
