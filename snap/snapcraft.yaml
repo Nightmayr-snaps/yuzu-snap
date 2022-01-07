@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '865'
+version: '872'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -65,7 +65,7 @@ parts:
       snapcraftctl build
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/yuzu.desktop
     build-snaps:
-    - nightmayr-kf5-qt-5-15-2-core20-sdk/latest/edge
+    - nightmayr-kf5-qt-5-15-2-core20-sdk/latest/stable
     build-packages:
     - cmake
     - ninja-build
