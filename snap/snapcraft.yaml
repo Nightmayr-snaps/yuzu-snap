@@ -1,6 +1,6 @@
 name: yuzu
 base: core20
-version: '1048'
+version: '1061'
 summary: Nintendo Switch Emulator
 description: |
   yuzu is an experimental open-source emulator for the Nintendo Switch from the creators of Citra. 
@@ -27,7 +27,9 @@ confinement: strict
 architectures:
 - build-on: amd64
 compression: lzo
-# package-repositories:
+package-repositories:
+  - type: apt
+    ppa: ubuntu-toolchain-r/test
 #   - type: apt
 #     ppa: beineri/opt-qt-5.15.2-focal
 parts:
@@ -59,8 +61,8 @@ parts:
       if [ ! -f /usr/bin/lsb_release ]; then
         apt install -y lsb-release
       fi
-      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
-      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 11
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 11
       pip3 install conan
       snapcraftctl build
       sed -i 's|Icon=yuzu|Icon=/usr/local/share/icons/hicolor/scalable/apps/yuzu.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/org.yuzu_emu.yuzu.desktop
@@ -70,8 +72,8 @@ parts:
     - cmake
     - ninja-build
     - build-essential
-    - gcc-10
-    - g++-10
+    - gcc-11
+    - g++-11
     - python3-pip
     - sqlite3
     - libsqlite3-dev
